@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>証明メーカー（2年 4章・5章）</title>
+<style>
+:root{--ink:#1f2328;--sub:#5b6470;--line:#d6dbe1;--bg:#f4f6f9;--card:#fff;--accent:#2f6fd6;--ok:#1f9d55;--ng:#d23c3c}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:860px;margin:0 auto;padding:12px 12px 0}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+h1{font-size:20px;margin:0}
+.seg{display:inline-flex;border:2px solid var(--accent);border-radius:999px;overflow:hidden}
+.seg button{border:0;background:#fff;color:var(--accent);font-size:15px;font-weight:700;padding:8px 13px;cursor:pointer;font-family:inherit}
+.seg button.on{background:var(--accent);color:#fff}
+.psel{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.psel select{flex:1;font:inherit;font-size:16px;padding:9px 10px;border-radius:10px;border:1px solid var(--line);background:#fff;min-width:0}
+.psel button{font:inherit;font-size:15px;padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.prob{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.prob p{flex:1 1 300px;margin:0;font-size:17px;line-height:1.8}
+.prob svg{flex:0 0 230px;width:230px;height:auto}
+.ptag{font-size:13px;color:var(--sub);margin-bottom:4px}
+.given{margin-top:10px;font-size:15px;line-height:1.8;background:#f6f9ff;border-radius:10px;padding:8px 12px}
+.given b{display:inline-block;min-width:3em;color:var(--accent)}
+body[data-mode=nohint] .given,body[data-mode=free] .given{display:none}
+.ptitle{font-weight:700;font-size:16px;margin:0 0 8px}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:7px 0;border-bottom:1px dashed #e3e7ec;font-size:17px;min-height:52px}
+.row:last-child{border-bottom:0}
+.fix{white-space:normal}
+.num{color:var(--sub);white-space:nowrap}
+.slot{font:inherit;font-size:16px;min-width:110px;min-height:40px;padding:6px 10px;border-radius:9px;border:2px dashed #b9c1cc;background:#fafbfc;color:var(--sub);cursor:pointer;text-align:left;line-height:1.4}
+.slot.filled{border-style:solid;color:var(--ink);background:#fff}
+.slot.focus{outline:3px solid var(--accent);outline-offset:2px}
+body[data-mode=hint] .slot.ok{border-color:var(--ok);background:#e9f8ef}
+body[data-mode=hint] .slot.ng{border-color:var(--ng);background:#fdeceb}
+.palette{position:sticky;bottom:0;z-index:5;background:#fff;border:1px solid var(--line);border-radius:14px 14px 0 0;padding:10px 12px 12px;box-shadow:0 -4px 14px rgba(0,0,0,.06);max-height:42vh;overflow:auto}
+.palhead{font-size:13px;color:var(--sub);margin-bottom:8px}
+.blocks{display:flex;flex-wrap:wrap;gap:8px}
+.blk{font:inherit;font-size:16px;padding:9px 13px;border-radius:10px;border:2px solid #9aa4b1;background:#f1f3f6;color:var(--ink);cursor:pointer;line-height:1.35;text-align:left}
+.blk:active{transform:scale(.97)}
+body[data-mode=hint] .c-tri{background:#e8f0ff;border-color:#4a78d0}
+body[data-mode=hint] .c-reason{background:#fff1dc;border-color:#d98a1c}
+body[data-mode=hint] .c-eq{background:#e6f6ea;border-color:#3a9a55}
+body[data-mode=hint] .c-cond{background:#f3e8ff;border-color:#8a4fc9}
+body[data-mode=hint] .c-cong{background:#ffe8ec;border-color:#d0476a}
+body[data-mode=hint] .c-concl{background:#fffbd6;border-color:#b59a00}
+body[data-mode=hint] .c-fact{background:#e0f7fa;border-color:#0097a7}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 10px}
+.btn{font:inherit;font-size:16px;font-weight:700;padding:10px 18px;border-radius:10px;border:0;cursor:pointer}
+.btn.main{background:var(--accent);color:#fff}
+.btn.sub{background:#e7ecf3;color:var(--ink)}
+.btn.warn{background:#fdeceb;color:var(--ng)}
+body[data-mode=nohint] #hintBtn,body[data-mode=free] #hintBtn{display:none}
+.freeonly{display:none}
+body[data-mode=free] .freeonly{display:inline-block}
+.row.fr{cursor:pointer;border-radius:8px;padding-left:6px}
+.row.fr.cur{background:#eef4ff;outline:2px solid var(--accent)}
+.lno{color:var(--sub);font-size:13px;min-width:1.6em}
+.tok{font:inherit;font-size:16px;padding:6px 10px;border-radius:8px;border:2px solid #9aa4b1;background:#fff;color:var(--ink);cursor:pointer;line-height:1.35;text-align:left}
+.ph{color:#a0a8b3;font-size:14px}
+.msg{font-size:16px;line-height:1.7;padding:10px 12px;border-radius:10px;margin-bottom:12px;display:none}
+.msg.show{display:block}
+.msg.info{background:#eef4ff}
+.msg.bad{background:#fff4e5}
+.msg.good{background:#e9f8ef;font-weight:700;color:#14683a;font-size:18px}
+.namebox{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.namebox input{font:inherit;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;width:12em}
+#imgPanel{display:none;margin-top:12px}
+#imgPanel.show{display:block}
+#imgPanel img{width:100%;border:1px solid var(--line);border-radius:8px;-webkit-touch-callout:default}
+.note{font-size:13px;color:var(--sub);line-height:1.6;margin-top:6px}
+.spacer{height:12px}
+</style>
+</head>
+<body data-mode="free">
+<div class="wrap">
+  <header>
+    <h1>証明メーカー</h1>
+    <div class="seg" role="group" aria-label="モード">
+      <button id="mHint">ヒントあり</button><button id="mNo">ヒントなし</button><button id="mFree">枠なし</button>
+    </div>
+  </header>
+  <div class="psel">
+    <button id="prevBtn" aria-label="前の問題">◀</button>
+    <select id="psel" aria-label="問題をえらぶ"></select>
+    <button id="nextBtn" aria-label="次の問題">▶</button>
+  </div>
+
+  <div class="card">
+    <div class="ptag" id="ptag"></div>
+    <div class="prob"><p id="probText"></p><svg id="fig" viewBox="-15 -15 330 280" aria-label="図"></svg></div>
+    <div class="given" id="given"></div>
+  </div>
+
+  <div class="card">
+    <div class="ptitle">【証明】</div>
+    <div id="proof"></div>
+  </div>
+
+  <div class="tools">
+    <button class="btn main" id="checkBtn">答え合わせ</button>
+    <button class="btn sub" id="hintBtn">ヒント</button>
+    <button class="btn sub freeonly" id="nlBtn">改行（次の行へ）</button>
+    <button class="btn sub freeonly" id="bsBtn">1つもどす</button>
+    <button class="btn warn" id="clearBtn">全部消す</button>
+  </div>
+  <div class="msg" id="msg"></div>
+
+  <div class="card">
+    <div class="ptitle">ロイロノートに貼る</div>
+    <div class="namebox">
+      <label for="nm">名前</label><input id="nm" placeholder="名前を入力">
+      <button class="btn main" id="imgBtn">画像にする</button>
+    </div>
+    <div id="imgPanel">
+      <img id="outImg" alt="証明の画像">
+      <div class="tools" style="margin-top:10px">
+        <button class="btn main" id="saveBtn" style="display:none">画像を保存・送る</button>
+        <button class="btn sub" id="copyBtn">画像をコピー</button>
+      </div>
+      <div class="note" id="imgNote">「画像をコピー」したあと、ロイロノートのカード上で貼り付けできます。うまくいかないときは、画像を長押しして「"写真"に保存」し、ロイロノートの「写真」から読み込んでください。</div>
+    </div>
+  </div>
+  <div class="spacer"></div>
+</div>
+
+<div class="palette" id="palette">
+  <div class="palhead" id="palhead"></div>
+  <div class="blocks" id="blocks"></div>
+</div>
+
+<script>
+/* ===== 問題データ（東京書籍 2年 4章・5章） =====
+   R:根拠 E:等しい辺や角 T:三角形の組 C:合同条件 G:合同の式 K:結論 X:わかること F:固定の言葉 N:番号
+   a に配列を入れると、どれでも正解になる（先頭がブロックとして表示される） */
+const R=(a,h)=>({c:"reason",a,h}), E=(a,h)=>({c:"eq",a,h}), T=a=>({c:"tri",a}), C=a=>({c:"cond",a}),
+      G=a=>({c:"cong",a}), K=(a,h)=>({c:"concl",a,h}), X=(a,h)=>({c:"fact",a,h}), F=t=>({f:t}), N={n:1};
+const C3="3組の辺がそれぞれ等しい", C2="2組の辺とその間の角がそれぞれ等しい", C1="1組の辺とその両端の角がそれぞれ等しい",
+      CR1="直角三角形で、斜辺と1つの鋭角がそれぞれ等しい";
+const KAKU="合同な図形の対応する角は等しいから", HEN="合同な図形の対応する辺は等しいから";
+const SAKKAKU=["平行線の錯角は等しいから"];
+/* 合同の証明の決まった形 */
+function cong(tri, eqs, cond, cg, last, concl){
+  const k=eqs.length, nums=["①","②","③","④"].slice(0,k).join("、")+"より";
+  return {
+    lines:[[T(tri),F("において")], ...eqs.map(([r,e])=>[R(r),E(e),N]), [F(nums),C(cond),F("から")], [G(cg)], [R(last),K(concl)]],
+    groups:[eqs.map((_,i)=>i+1)]
+  };
+}
+const ISO={A:[150,28],B:[35,215],C:[265,215],D:[150,215]};
+const PARA={A:[80,40],D:[270,40],B:[30,200],C:[220,200]};
+const PARA_SEG=["AB","BC","CD","DA"];
+
+const PROBLEMS=[
+/* ---------- 4章 ---------- */
+{id:"naikaku",ch:4,page:"p.105",title:"三角形の内角の和",
+ text:"△ABCの辺BCの延長をCDとし、点Cを通って辺ABに平行な直線CEをひきます。このことを使って、三角形の内角の和が180°であることを証明しなさい。",
+ given:"AB∥CE", concl:"∠BAC＋∠ABC＋∠ACB＝180°",
+ fig:{pts:{A:[105,40],B:[25,210],C:[175,210],D:[285,210],E:[243,66]},segs:["AB","AC","BC","CD","CE"],
+   marks:{par:[["BA",1],["CE",1]],arc:[["A","B","C",1],["C","A","E",1],["B","A","C",2],["C","E","D",2]]}},
+ lines:[
+  [R("平行線の錯角は等しいから"),E("∠BAC＝∠ACE"),N],
+  [R("平行線の同位角は等しいから"),E("∠ABC＝∠ECD"),N],
+  [F("①、②より"),X("∠BAC＋∠ABC＋∠ACB＝∠ACE＋∠ECD＋∠ACB","①、②を使って、3つの角を点Cのまわりに集めよう。")],
+  [R("∠BCDは一直線の角だから"),K("∠BAC＋∠ABC＋∠ACB＝180°")]],
+ groups:[[0,1]],
+ dummy:{eq:["∠BAC＝∠ECD","∠ABC＝∠ACE","∠ACB＝∠ECD"],fact:["∠BAC＋∠ABC＋∠ACB＝∠ACE＋∠ECD"],concl:["∠ACE＋∠ECD＝180°"]},
+ special:{"∠BAC＝∠ECD":"∠BACと∠ECDは錯角でも同位角でもないね。","∠ABC＝∠ACE":"∠ABCと同じ大きさになるのは、点Cのどの角かな？"}},
+
+{id:"nitoubun",ch:4,page:"p.117",title:"角の二等分線の作図",
+ text:"∠XOYの二等分線を作図しました（作図の手順から OA＝OB、AC＝BC）。半直線OCが∠XOYの二等分線であること、つまり∠AOC＝∠BOCを証明しなさい。",
+ given:"OA＝OB、AC＝BC", concl:"∠AOC＝∠BOC",
+ fig:{pts:{O:[25,200],X:[245,40],Y:[285,200],A:[146,112],B:[175,200],C:[244,129]},segs:["OX","OY","OC","AC","BC"],
+   marks:{tick:[["OA",1],["OB",1],["AC",2],["BC",2]],fill:["AOC","BOC"]}},
+ ...cong("△AOCと△BOC",[[["作図より","仮定より"],"OA＝OB"],[["作図より","仮定より"],"AC＝BC"],["共通な辺だから","OC＝OC"]],C3,"△AOC≡△BOC",KAKU,"∠AOC＝∠BOC"),
+ dummy:{eq:["OA＝AC","∠OAC＝∠OBC","AB＝OC"],tri:["△AOBと△ACB","△OABと△OAC"]}},
+
+{id:"sakkaku",ch:4,page:"p.118",title:"線分の交点と平行線",
+ text:"線分ABとCDの交点をEとし、EA＝EB、AD∥CBとなるようにかきました。このとき、ED＝ECとなることを証明しなさい。",
+ given:"EA＝EB、AD∥CB", concl:"ED＝EC",
+ fig:{pts:{A:[70,40],D:[210,40],C:[90,200],B:[230,200],E:[150,120]},segs:["AB","CD","AD","CB"],lab:{E:[18,2]},
+   marks:{tick:[["EA",1],["EB",1]],par:[["AD",1],["CB",1]],arc:[["A","E","D",1],["B","E","C",1],["E","A","D",2],["E","B","C",2]],fill:["AED","BEC"]}},
+ ...cong("△AEDと△BEC",[["仮定より","EA＝EB"],["対頂角は等しいから","∠AED＝∠BEC"],[["平行線の錯角は等しいから","AD∥CBより、平行線の錯角は等しいから"],"∠EAD＝∠EBC"]],C1,"△AED≡△BEC",HEN,"ED＝EC"),
+ dummy:{eq:["∠EDA＝∠ECB","AD＝CB","EA＝ED"],tri:["△ACDと△BDC","△AEDと△AEC"]},
+ special:{"∠EDA＝∠ECB":"「1組の辺とその両端の角」を使うには、辺EAの両端の角（∠Eと∠A）がほしいね。"}},
+
+{id:"taichou",ch:4,page:"p.119",title:"中点で交わる2つの線分",
+ text:"線分ABの中点Oで、ABと交わる線分CDをOC＝ODとなるようにかき、点AとC、点BとDを結びます。このとき、∠OAC＝∠OBDとなることを証明しなさい。",
+ given:"OA＝OB、OC＝OD", concl:"∠OAC＝∠OBD",
+ fig:{pts:{A:[30,130],B:[270,130],O:[150,130],C:[100,30],D:[200,230]},segs:["AB","CD","AC","BD"],lab:{O:[14,16]},
+   marks:{tick:[["OA",1],["OB",1],["OC",2],["OD",2]],arc:[["O","A","C",1],["O","B","D",1]],fill:["ACO","BDO"]}},
+ ...cong("△ACOと△BDO",[["仮定より","OA＝OB"],["仮定より","OC＝OD"],["対頂角は等しいから","∠AOC＝∠BOD"]],C2,"△ACO≡△BDO",KAKU,"∠OAC＝∠OBD"),
+ dummy:{eq:["AC＝BD","∠OCA＝∠OBD","OA＝OC"],tri:["△ACOと△ADO","△ABCと△ABD"]}},
+
+{id:"kihon2",ch:4,page:"p.121",title:"AB＝DC、AC＝DBのとき",
+ text:"右の図で、AB＝DC、AC＝DBならば、∠BAC＝∠CDBとなります。このことを証明しなさい。",
+ given:"AB＝DC、AC＝DB", concl:"∠BAC＝∠CDB",
+ fig:{pts:{A:[70,40],D:[230,40],B:[30,210],C:[270,210]},segs:["AB","AC","DB","DC","BC"],
+   marks:{tick:[["AB",1],["DC",1],["AC",2],["DB",2]],fill:["ABC","DCB"]}},
+ ...cong("△ABCと△DCB",[["仮定より","AB＝DC"],["仮定より","AC＝DB"],["共通な辺だから",["BC＝CB","BC＝BC"]]],C3,"△ABC≡△DCB",KAKU,"∠BAC＝∠CDB"),
+ dummy:{eq:["AB＝AC","∠ABC＝∠DBC","BC＝AD"],tri:["△ABDと△DCA","△ABCと△ABD"]}},
+
+{id:"shou4",ch:4,page:"p.122",title:"BA＝DA、∠B＝∠Dのとき",
+ text:"右の図で、BA＝DA、∠B＝∠Dならば、BC＝DEとなります。このことを証明しなさい。",
+ given:"BA＝DA、∠B＝∠D", concl:"BC＝DE",
+ fig:{pts:{A:[150,20],B:[40,220],D:[260,220],E:[90,130],C:[210,130]},segs:["AB","AD","BC","DE"],
+   marks:{tick:[["AB",1],["AD",1]],arc:[["B","A","C",1],["D","A","E",1],["A","B","D",2]],fill:["ABC","ADE"]}},
+ ...cong("△ABCと△ADE",[["仮定より",["AB＝AD","BA＝DA"]],["仮定より",["∠ABC＝∠ADE","∠B＝∠D"]],["共通な角だから",["∠BAC＝∠DAE","∠A＝∠A"]]],C1,"△ABC≡△ADE",HEN,"BC＝DE"),
+ dummy:{eq:["AE＝AC","∠ACB＝∠AED","BE＝DC"],tri:["△ABDと△ACE","△EBCと△CDE"]},
+ special:{"∠ACB＝∠AED":"∠ACB＝∠AEDは、まだわかっていないことです。仮定や図からわかることを使おう。"}},
+
+/* ---------- 5章 ---------- */
+{id:"teikaku",ch:5,page:"p.129",title:"二等辺三角形の底角",
+ text:"AB＝ACの二等辺三角形ABCで、∠Aの二等分線と辺BCとの交点をDとします。このとき、∠B＝∠Cとなることを証明しなさい。",
+ given:"AB＝AC、∠BAD＝∠CAD", concl:"∠B＝∠C",
+ fig:{pts:ISO,segs:["AB","AC","BC","AD"],marks:{tick:[["AB",1],["AC",1]],arc:[["A","B","D",1],["A","D","C",1]],fill:["ABD","ACD"]}},
+ ...cong("△ABDと△ACD",[["仮定より","AB＝AC"],[["仮定より","ADは∠Aの二等分線だから"],"∠BAD＝∠CAD"],["共通な辺だから","AD＝AD"]],C2,"△ABD≡△ACD",KAKU,["∠B＝∠C","∠ABD＝∠ACD"]),
+ dummy:{eq:["BD＝CD","∠ADB＝∠ADC","AB＝AD"],tri:["△ABCと△ABD","△ABCと△ACD"],concl:["BD＝CD","∠BAD＝∠CAD"]},
+ special:{"BD＝CD":"BD＝CDは、合同を示したあとでわかることです。今わかっていることだけを使おう。","∠ADB＝∠ADC":"∠ADB＝∠ADCは、まだわかっていません。"}},
+
+{id:"suichoku",ch:5,page:"p.131",title:"頂角の二等分線と底辺（AD⊥BC）",
+ text:"AB＝ACの二等辺三角形ABCで、頂角∠Aの二等分線と辺BCとの交点をDとします。△ABD≡△ACDであることを使って、AD⊥BCとなることを証明しなさい。",
+ given:"AB＝AC、∠BAD＝∠CAD（△ABD≡△ACD）", concl:"AD⊥BC",
+ fig:{pts:ISO,segs:["AB","AC","BC","AD"],marks:{tick:[["AB",1],["AC",1]],arc:[["A","B","D",1],["A","D","C",1]]}},
+ lines:[
+  [F("△ABD≡△ACDより"),R(KAKU),E("∠ADB＝∠ADC"),N],
+  [F("また、"),X("∠ADB＋∠ADC＝180°","∠ADBと∠ADCを合わせると、一直線の角になるね。"),N],
+  [F("①、②より"),X("2∠ADB＝180°")],
+  [F("したがって、"),X("∠ADB＝90°")],
+  [F("すなわち、"),K("AD⊥BC")]],
+ groups:[],
+ dummy:{eq:["BD＝CD","∠BAD＝∠CAD"],fact:["∠ADB＋∠ADC＝90°","∠ADB＝180°","∠ADB＝45°"],concl:["AD∥BC","AD＝BC"]}},
+
+{id:"tako",ch:5,page:"p.132",title:"CA＝CB、DA＝DBのとき",
+ text:"右の図で、CA＝CB、DA＝DBとします。このとき、∠ACD＝∠BCDであることを証明しなさい。",
+ given:"CA＝CB、DA＝DB", concl:"∠ACD＝∠BCD",
+ fig:{pts:{C:[150,25],A:[40,130],B:[260,130],D:[150,215],E:[150,130]},segs:["CA","CB","DA","DB","CD","AB"],lab:{E:[13,-10]},
+   marks:{tick:[["CA",1],["CB",1],["DA",2],["DB",2]],fill:["ACD","BCD"]}},
+ ...cong("△ACDと△BCD",[["仮定より","CA＝CB"],["仮定より","DA＝DB"],["共通な辺だから","CD＝CD"]],C3,"△ACD≡△BCD",KAKU,"∠ACD＝∠BCD"),
+ dummy:{eq:["CA＝DA","∠CAD＝∠CBD","AE＝BE"],tri:["△ACEと△BCE","△AEDと△BED"]},
+ special:{"∠CAD＝∠CBD":"∠CAD＝∠CBDは、合同を示したあとでわかることです。","AE＝BE":"AE＝BEは、まだわかっていません。"}},
+
+{id:"jouken",ch:5,page:"p.134",title:"二等辺三角形になるための条件",
+ text:"△ABCで、∠B＝∠CならばAB＝ACとなることを証明しなさい。（∠Aの二等分線をひき、BCとの交点をDとして考えます。）",
+ given:"∠B＝∠C", concl:"AB＝AC",
+ fig:{pts:ISO,segs:["AB","AC","BC","AD"],marks:{arc:[["B","A","C",1],["C","A","B",1],["A","B","D",2],["A","D","C",2]],fill:["ABD","ACD"]}},
+ lines:[
+  [F("∠Aの二等分線をひき、BCとの交点をDとする。")],
+  [T("△ABDと△ACD"),F("において")],
+  [R("仮定より"),E(["∠B＝∠C","∠ABD＝∠ACD"])],
+  [R(["ADは∠Aの二等分線だから","仮定より"]),E("∠BAD＝∠CAD"),N],
+  [R("三角形の内角の和は180°だから","∠B＝∠C、∠BAD＝∠CADなので、残りの角も等しくなるね。"),E("∠ADB＝∠ADC"),N],
+  [R("共通な辺だから"),E("AD＝AD"),N],
+  [F("①、②、③より"),C(C1),F("から")],
+  [G("△ABD≡△ACD")],
+  [R(HEN),K("AB＝AC")]],
+ groups:[[3,5]],
+ dummy:{eq:["AB＝AC","BD＝CD"],tri:["△ABCと△ABD"]},
+ special:{"AB＝AC":"AB＝ACは結論です。結論を根拠に使うことはできません。"}},
+
+{id:"pbc",ch:5,page:"p.134",title:"底角の二等分線の交点",
+ text:"AB＝ACの二等辺三角形ABCで、底角∠B、∠Cのそれぞれの二等分線をひき、その交点をPとします。このとき、△PBCは二等辺三角形になることを証明しなさい。",
+ given:"AB＝AC、∠ABP＝∠PBC、∠ACP＝∠PCB", concl:"△PBCは二等辺三角形",
+ fig:{pts:{A:[150,25],B:[40,215],C:[260,215],P:[150,152]},segs:["AB","AC","BC","BP","CP"],lab:{P:[0,-16]},
+   marks:{tick:[["AB",1],["AC",1]],arc:[["B","A","P",1],["B","P","C",1],["C","A","P",1],["C","P","B",1]],fill:["PBC"]}},
+ lines:[
+  [R("二等辺三角形の底角は等しいから"),E("∠ABC＝∠ACB"),N],
+  [R("BP、CPはそれぞれ∠B、∠Cの二等分線だから"),X("∠PBC＝½∠ABC、∠PCB＝½∠ACB"),N],
+  [F("①、②より"),X("∠PBC＝∠PCB")],
+  [R("2つの角が等しいから"),K("△PBCは二等辺三角形である")]],
+ groups:[],
+ dummy:{eq:["∠ABP＝∠ACP","PB＝PC"],fact:["∠PBC＝∠ABC","∠PBC＝∠PCA"],concl:["△ABPは二等辺三角形である","△PBCは正三角形である"]},
+ special:{"PB＝PC":"PB＝PCは、まだわかっていません。"}},
+
+{id:"seisan",ch:5,page:"p.134",title:"3つの角が等しい三角形",
+ text:"3つの角が等しい三角形は正三角形です。△ABCで、∠A＝∠B＝∠Cならば、AB＝BC＝CAとなることを証明しなさい。",
+ given:"∠A＝∠B＝∠C", concl:"AB＝BC＝CA",
+ fig:{pts:{A:[150,30],B:[45,212],C:[255,212]},segs:["AB","BC","CA"],marks:{arc:[["A","B","C",1],["B","A","C",1],["C","A","B",1]]}},
+ lines:[
+  [F("∠B＝∠Cより"),R("2つの角が等しい三角形は二等辺三角形だから"),E(["AB＝AC","AC＝AB"],"∠Bと∠Cが等しいとき、等しくなるのは∠Bと∠Cに向かい合う辺だよ。"),N],
+  [F("∠A＝∠Cより"),R("2つの角が等しい三角形は二等辺三角形だから"),E(["BA＝BC","AB＝BC","BC＝BA"],"∠Aと∠Cに向かい合う辺はどれかな？"),N],
+  [F("①、②より"),K("AB＝BC＝CA")]],
+ groups:[],
+ dummy:{eq:["AC＝BC","∠A＝∠B"],concl:["∠A＝∠B＝∠C"]}},
+
+{id:"chokkaku",ch:5,page:"p.137",title:"底辺の中点から2辺への垂線",
+ text:"AB＝ACの二等辺三角形ABCの底辺BCの中点Mから2辺AB、ACに垂線をひき、AB、ACとの交点をそれぞれD、Eとします。このとき、MD＝MEとなることを証明しなさい。",
+ given:"AB＝AC、MB＝MC、MD⊥AB、ME⊥AC", concl:"MD＝ME",
+ fig:{pts:{A:[150,25],B:[40,215],C:[260,215],M:[150,215],D:[68,167],E:[232,167]},segs:["AB","AC","BC","MD","ME"],
+   marks:{tick:[["BM",1],["MC",1]],right:[["D","M","B"],["E","M","C"]],arc:[["B","A","C",1],["C","A","B",1]],fill:["MBD","MCE"]}},
+ ...cong("△MBDと△MCE",[["仮定より","MB＝MC"],["仮定より",["∠MDB＝∠MEC＝90°","∠MDB＝∠MEC"]],["二等辺三角形の底角は等しいから","∠MBD＝∠MCE"]],CR1,"△MBD≡△MCE",HEN,"MD＝ME"),
+ dummy:{eq:["BD＝CE","MD＝ME","AD＝AE"],tri:["△ABMと△ACM","△ADMと△AEM"]},
+ special:{"MD＝ME":"MD＝MEは結論です。結論を根拠に使うことはできません。","BD＝CE":"BD＝CEは、まだわかっていません。"}},
+
+{id:"taihen",ch:5,page:"p.141",title:"平行四辺形の対辺",
+ text:"平行四辺形ABCDで、2組の対辺がそれぞれ等しいことを証明しなさい。（対角線ACをひいて考えます。）",
+ given:"AB∥DC、AD∥BC", concl:"AB＝DC、AD＝BC",
+ fig:{pts:PARA,segs:[...PARA_SEG,"AC"],marks:{par:[["AD",1],["BC",1],["BA",2],["CD",2]],arc:[["A","B","C",1],["C","D","A",1],["C","A","B",2],["A","C","D",2]],fill:["ABC","CDA"]}},
+ lines:[
+  [F("対角線ACをひく。")],
+  [T("△ABCと△CDA"),F("において")],
+  [R("共通な辺だから"),E(["AC＝CA","AC＝AC"]),N],
+  [R(["AB∥DCより、平行線の錯角は等しいから",...SAKKAKU]),E("∠BAC＝∠DCA"),N],
+  [R(["AD∥BCより、平行線の錯角は等しいから",...SAKKAKU]),E("∠BCA＝∠DAC"),N],
+  [F("①、②、③より"),C(C1),F("から")],
+  [G("△ABC≡△CDA")],
+  [R(HEN),K(["AB＝CD、BC＝DA","AB＝DC、AD＝BC"])]],
+ groups:[[2,3,4]],
+ dummy:{eq:["∠BAC＝∠BCA","∠ABC＝∠CDA","AB＝BC"],tri:["△ABDと△CDB"]}},
+
+{id:"chuuten",ch:5,page:"p.141",title:"平行四辺形の対角線",
+ text:"平行四辺形ABCDの対角線の交点をOとします。平行四辺形の対角線はそれぞれの中点で交わる（AO＝CO、BO＝DO）ことを証明しなさい。",
+ given:"AB∥DC、AD∥BC", concl:"AO＝CO、BO＝DO",
+ fig:{pts:{...PARA,O:[150,120]},segs:[...PARA_SEG,"AC","BD"],lab:{O:[0,-14]},
+   marks:{par:[["AD",1],["BC",1],["BA",2],["CD",2]],arc:[["B","A","D",1],["D","C","B",1],["A","B","C",2],["C","D","A",2]],fill:["ABO","CDO"]}},
+ ...cong("△ABOと△CDO",[["平行四辺形の対辺は等しいから","AB＝CD"],[["AB∥DCより、平行線の錯角は等しいから",...SAKKAKU],"∠ABO＝∠CDO"],[["AB∥DCより、平行線の錯角は等しいから",...SAKKAKU],"∠BAO＝∠DCO"]],C1,"△ABO≡△CDO",HEN,["AO＝CO、BO＝DO","AO＝CO、BO＝DO"]),
+ dummy:{eq:["∠AOB＝∠COD","AO＝BO","AD＝BC"],tri:["△ABOと△ADO","△AODと△BOC"]},
+ special:{"∠AOB＝∠COD":"∠AOB＝∠CODは正しいけれど、「1組の辺とその両端の角」にするには、辺ABの両端の角がほしいね。"}},
+
+{id:"oeof",ch:5,page:"p.142",title:"対角線の交点を通る直線",
+ text:"平行四辺形ABCDの対角線の交点をOとし、Oを通る直線が辺AD、BCと交わる点をそれぞれE、Fとします。このとき、OE＝OFとなることを証明しなさい。",
+ given:"四角形ABCDは平行四辺形", concl:"OE＝OF",
+ fig:{pts:{...PARA,O:[150,120],E:[120,40],F:[180,200]},segs:[...PARA_SEG,"AC","BD","EF"],lab:{O:[17,-2]},
+   marks:{par:[["AD",1],["BC",1]],arc:[["O","A","E",1],["O","C","F",1],["A","E","O",2],["C","F","O",2]],fill:["AOE","COF"]}},
+ ...cong("△AOEと△COF",[["平行四辺形の対角線はそれぞれの中点で交わるから",["OA＝OC","AO＝CO"]],["対頂角は等しいから","∠AOE＝∠COF"],[["AD∥BCより、平行線の錯角は等しいから",...SAKKAKU],"∠EAO＝∠FCO"]],C1,"△AOE≡△COF",HEN,"OE＝OF"),
+ dummy:{eq:["OB＝OD","AE＝CF","∠AEO＝∠CBO"],tri:["△ABOと△CDO","△EODと△FOB"]},
+ special:{"AE＝CF":"AE＝CFは、合同を示したあとでわかることです。","OB＝OD":"OB＝ODは正しいけれど、△AOEと△COFの辺ではないね。"}},
+
+{id:"aecf",ch:5,page:"p.142",title:"対角線上の2点（AE＝CF）",
+ text:"平行四辺形ABCDの対角線BD上に、BE＝DFとなるように2点E、Fをとると、AE＝CFとなります。このことを証明しなさい。",
+ given:"四角形ABCDは平行四辺形、BE＝DF", concl:"AE＝CF",
+ fig:{pts:{...PARA,E:[102,152],F:[198,88]},segs:[...PARA_SEG,"BD","AE","CF"],
+   marks:{tick:[["BE",1],["DF",1]],par:[["BA",1],["CD",1]],arc:[["B","A","D",1],["D","C","B",1]],fill:["ABE","CDF"]}},
+ ...cong("△ABEと△CDF",[["平行四辺形の対辺は等しいから","AB＝CD"],["仮定より","BE＝DF"],[["AB∥DCより、平行線の錯角は等しいから",...SAKKAKU],"∠ABE＝∠CDF"]],C2,"△ABE≡△CDF",HEN,"AE＝CF"),
+ dummy:{eq:["AE＝CF","∠BAE＝∠DCF","BF＝DE"],tri:["△AEDと△CFB","△ABDと△CDB"]},
+ special:{"AE＝CF":"AE＝CFは結論です。結論を根拠に使うことはできません。"}},
+
+{id:"heikou1",ch:5,page:"p.147",title:"平行四辺形になることの証明①",
+ text:"平行四辺形ABCDの対角線BD上に、BE＝DFとなるように2点E、Fをとり、四角形AECFをつくると、その四角形は平行四辺形になります。このことを証明しなさい。",
+ given:"四角形ABCDは平行四辺形、BE＝DF", concl:"四角形AECFは平行四辺形",
+ fig:{pts:{...PARA,E:[102,152],F:[198,88],O:[150,120]},segs:[...PARA_SEG,"BD","AC","AE","EC","CF","FA"],lab:{O:[16,-6]},
+   marks:{tick:[["BE",1],["DF",1]]}},
+ lines:[
+  [F("平行四辺形ABCDの対角線の交点をOとする。")],
+  [R("平行四辺形の対角線はそれぞれの中点で交わるから"),E("OA＝OC"),N],
+  [R("平行四辺形の対角線はそれぞれの中点で交わるから"),E("OB＝OD"),N],
+  [R("仮定より"),E("BE＝DF"),N],
+  [F("②、③から"),X("OB－BE＝OD－DF","OEは、OBからBEをひいた長さだね。")],
+  [F("すなわち、"),X("OE＝OF"),N],
+  [F("①、④より"),R("対角線がそれぞれの中点で交わるから"),K("四角形AECFは平行四辺形である")]],
+ groups:[],
+ dummy:{eq:["AE＝CF","OA＝OB"],fact:["OB＋BE＝OD＋DF","OE＝OA"],concl:["四角形AECFは長方形である","四角形AECFはひし形である"]}},
+
+{id:"heikou2",ch:5,page:"p.147",title:"平行四辺形になることの証明②",
+ text:"平行四辺形ABCDの辺BC、AD上に、BE＝DFとなるように2点E、Fをとり、四角形AECFをつくると、その四角形は平行四辺形になります。このことを証明しなさい。",
+ given:"四角形ABCDは平行四辺形、BE＝DF", concl:"四角形AECFは平行四辺形",
+ fig:{pts:{...PARA,E:[90,200],F:[210,40]},segs:[...PARA_SEG,"AE","CF"],marks:{tick:[["BE",1],["DF",1]],par:[["AD",1],["BC",1]]}},
+ lines:[
+  [R(["AD∥BCだから","平行四辺形の対辺は平行だから"]),X("AF∥EC"),N],
+  [R("平行四辺形の対辺は等しいから"),E("AD＝BC"),N],
+  [R("仮定より"),E(["DF＝BE","BE＝DF"]),N],
+  [F("②、③から"),X("AD－DF＝BC－BE")],
+  [F("すなわち、"),X("AF＝EC"),N],
+  [F("①、④より"),R("1組の対辺が平行でその長さが等しいから"),K("四角形AECFは平行四辺形である")]],
+ groups:[],
+ dummy:{eq:["AE＝CF","AB＝AD"],fact:["AF∥AB","AD＋DF＝BC＋BE","AF＝AE"],concl:["四角形AECFはひし形である"]}},
+
+{id:"rect",ch:5,page:"p.149",title:"長方形の対角線",
+ text:"長方形ABCDの対角線AC、BDをひきます。△ABC≡△DCBを導き、長方形の対角線は等しい（AC＝DB）ことを証明しなさい。",
+ given:"四角形ABCDは長方形", concl:"AC＝DB",
+ fig:{pts:{A:[50,40],D:[250,40],B:[50,200],C:[250,200]},segs:["AB","BC","CD","DA","AC","BD"],
+   marks:{right:[["B","A","C"],["C","B","D"]],tick:[["AB",1],["DC",1]],fill:["ABC","DCB"]}},
+ ...cong("△ABCと△DCB",[[["平行四辺形の対辺は等しいから","長方形の対辺は等しいから"],"AB＝DC"],["長方形の4つの角はすべて等しいから","∠ABC＝∠DCB"],["共通な辺だから",["BC＝CB","BC＝BC"]]],C2,"△ABC≡△DCB",HEN,"AC＝DB"),
+ dummy:{eq:["AC＝DB","AB＝BC","∠BAC＝∠BDC"],tri:["△ABDと△ACD","△ABOと△DCO"]},
+ special:{"AC＝DB":"AC＝DBは結論です。結論を根拠に使うことはできません。"}},
+
+{id:"hishi",ch:5,page:"p.149",title:"ひし形の対角線",
+ text:"ひし形ABCDの対角線AC、BDの交点をOとします。△ABO≡△ADOを導き、ひし形の対角線は垂直に交わる（AC⊥BD）ことを証明しなさい。",
+ given:"四角形ABCDはひし形", concl:"AC⊥BD",
+ fig:{pts:{A:[150,25],B:[40,125],C:[150,225],D:[260,125],O:[150,125]},segs:["AB","BC","CD","DA","AC","BD"],lab:{O:[13,-12]},
+   marks:{tick:[["AB",1],["BC",1],["CD",1],["DA",1],["BO",2],["OD",2]],fill:["ABO","ADO"]}},
+ lines:[
+  [T("△ABOと△ADO"),F("において")],
+  [R("ひし形の4つの辺はすべて等しいから"),E("AB＝AD"),N],
+  [R("平行四辺形の対角線はそれぞれの中点で交わるから"),E("BO＝DO"),N],
+  [R("共通な辺だから"),E("AO＝AO"),N],
+  [F("①、②、③より"),C(C3),F("から")],
+  [G("△ABO≡△ADO")],
+  [R(KAKU),E("∠AOB＝∠AOD"),N],
+  [F("また、"),X("∠AOB＋∠AOD＝180°"),N],
+  [F("④、⑤より"),X("∠AOB＝90°")],
+  [F("すなわち、"),K("AC⊥BD")]],
+ groups:[[1,2,3]],
+ dummy:{eq:["AO＝BO","∠ABO＝∠ADO"],fact:["∠AOB＋∠AOD＝90°","∠AOB＝180°"],concl:["AC＝BD","AC∥BD"],tri:["△ABOと△CDO"]}},
+
+{id:"seisan2",ch:5,page:"p.152",title:"2つの正三角形",
+ text:"点Bを共有する正三角形ABDと正三角形BCEを、3点A、B、Cが一直線上にあるようにかき、点AとE、点DとCを結びます。このとき、AE＝DCとなることを証明しなさい。",
+ given:"△ABD、△BCEは正三角形", concl:"AE＝DC",
+ fig:{pts:{A:[20,200],B:[140,200],C:[250,200],D:[80,96],E:[195,105]},segs:["AB","BD","DA","BC","CE","EB","AE","DC"],
+   marks:{tick:[["AB",1],["BD",1],["BE",2],["BC",2]],arc:[["B","A","D",1],["B","E","C",1]],fill:["ABE","DBC"]}},
+ lines:[
+  [T("△ABEと△DBC"),F("において")],
+  [R("△ABDは正三角形だから"),E("AB＝DB"),N],
+  [R("△BCEは正三角形だから"),E("BE＝BC"),N],
+  [R("正三角形の1つの内角は60°だから"),X("∠ABD＝∠EBC")],
+  [F("また、"),X("∠ABE＝∠ABD＋∠DBE")],
+  [X("∠DBC＝∠EBC＋∠DBE")],
+  [F("よって、"),E("∠ABE＝∠DBC"),N],
+  [F("①、②、③より"),C(C2),F("から")],
+  [G("△ABE≡△DBC")],
+  [R(HEN),K("AE＝DC")]],
+ groups:[[1,2]],
+ dummy:{eq:["AE＝DC","∠BAE＝∠BDC","AB＝BC"],fact:["∠ABE＝∠ABD","∠ABD＝∠DBE"],tri:["△ABDと△BCE","△ADCと△AEC"]},
+ special:{"AE＝DC":"AE＝DCは結論です。結論を根拠に使うことはできません。"}},
+
+{id:"pbpc",ch:5,page:"p.158",title:"頂角の二等分線上の点",
+ text:"AB＝ACの二等辺三角形ABCの頂角∠Aの二等分線上の1点をPとすると、PB＝PCとなります。このことを証明しなさい。",
+ given:"AB＝AC、∠BAP＝∠CAP", concl:"PB＝PC",
+ fig:{pts:{A:[150,25],B:[40,215],C:[260,215],P:[150,140],H:[150,215]},hide:["H"],segs:["AB","AC","BC","AH","BP","CP"],lab:{P:[14,-2]},
+   marks:{tick:[["AB",1],["AC",1]],arc:[["A","B","P",1],["A","P","C",1]],fill:["ABP","ACP"]}},
+ ...cong("△ABPと△ACP",[["仮定より","AB＝AC"],[["仮定より","APは∠Aの二等分線だから"],"∠BAP＝∠CAP"],["共通な辺だから","AP＝AP"]],C2,"△ABP≡△ACP",HEN,"PB＝PC"),
+ dummy:{eq:["PB＝PC","∠ABP＝∠ACP","BP＝AP"],tri:["△PBCと△ABC","△ABPと△PBC"]},
+ special:{"PB＝PC":"PB＝PCは結論です。結論を根拠に使うことはできません。"}}
+];
+
+/* ===== 追加分 ===== */
+const PARA2={A:[80,40],D:[270,40],B:[30,200],C:[220,200]};
+const EQT={A:[150,30],B:[45,212],C:[255,212]};
+const KITE={pts:{C:[150,25],A:[40,130],B:[260,130],D:[150,215],E:[150,130]},segs:["CA","CB","DA","DB","CD","AB"],lab:{E:[13,-10]}};
+const TWO_PARA={pts:{A:[90,30],D:[230,30],B:[40,125],C:[180,125],E:[80,220],F:[220,220]}};
+PROBLEMS.push(
+{id:"naikaku2",ch:4,page:"p.106",title:"三角形の内角の和（DE∥BC）",
+ text:"△ABCの頂点Aを通り、辺BCに平行な直線DEをひきます。この図を使って、三角形の内角の和が180°であることを証明しなさい。",
+ given:"DE∥BC", concl:"∠BAC＋∠ABC＋∠ACB＝180°",
+ fig:{pts:{D:[20,40],A:[150,40],E:[280,40],B:[60,210],C:[250,210]},segs:["DE","AB","AC","BC"],
+   marks:{par:[["DE",1],["BC",1]],arc:[["A","D","B",1],["B","A","C",1],["A","E","C",2],["C","A","B",2]]}},
+ lines:[
+  [R("平行線の錯角は等しいから"),E("∠DAB＝∠ABC"),N],
+  [R("平行線の錯角は等しいから"),E("∠EAC＝∠ACB"),N],
+  [F("①、②より"),X("∠BAC＋∠ABC＋∠ACB＝∠BAC＋∠DAB＋∠EAC","①、②を使って、3つの角を点Aのまわりに集めよう。")],
+  [R("∠DAEは一直線の角だから"),K("∠BAC＋∠ABC＋∠ACB＝180°")]],
+ groups:[[0,1]],
+ dummy:{eq:["∠DAB＝∠ACB","∠EAC＝∠ABC"],fact:["∠BAC＋∠ABC＋∠ACB＝∠DAB＋∠EAC"],concl:["∠DAB＋∠EAC＝180°"]},
+ special:{"∠DAB＝∠ACB":"∠DABと錯角の位置にあるのはどの角かな？","∠EAC＝∠ABC":"∠EACと錯角の位置にあるのはどの角かな？"}},
+
+{id:"gaikaku",ch:4,page:"p.124",title:"∠ADC＝∠A＋∠B＋∠C（章の問題B4）",
+ text:"右の図で、∠ADC＝∠A＋∠B＋∠Cが成り立ちます。点Dを通る半直線BEをひいて、このことを証明しなさい。",
+ given:"右の図（BEは点Dを通る半直線）", concl:"∠ADC＝∠A＋∠B＋∠C",
+ fig:{pts:{A:[60,30],B:[30,220],C:[270,200],D:[140,150],E:[228,94]},segs:["AB","BC","AD","DC","BE"],
+   marks:{arc:[["A","B","D",1],["B","A","C",1],["C","B","D",1]]}},
+ lines:[
+  [R("三角形の外角は、それと隣り合わない2つの内角の和に等しいから"),X("△ABDで、∠ADE＝∠BAD＋∠ABD"),N],
+  [R("三角形の外角は、それと隣り合わない2つの内角の和に等しいから"),X("△CBDで、∠CDE＝∠BCD＋∠CBD"),N],
+  [F("①、②より"),X("∠ADE＋∠CDE＝∠BAD＋∠ABD＋∠CBD＋∠BCD","∠ADCは、∠ADEと∠CDEに分けられるね。")],
+  [F("したがって、"),K("∠ADC＝∠A＋∠B＋∠C")]],
+ groups:[[0,1]],
+ dummy:{fact:["△ABDで、∠ADE＝∠BAD＋∠ADB","∠ADE＋∠CDE＝180°"],concl:["∠ADC＝180°"]}},
+
+{id:"chokkaku90",ch:5,page:"p.128",title:"直角をつくる方法（∠BAC＝90°）",
+ text:"右の図で、OA＝OB＝OCです。∠OAB＝∠a、∠OAC＝∠bとして、∠BAC＝90°となることを証明しなさい。",
+ given:"OA＝OB＝OC", concl:"∠BAC＝90°",
+ fig:{pts:{B:[30,200],O:[150,200],C:[270,200],A:[90,96]},segs:["AB","AC","BC","OA"],lab:{O:[0,18]},
+   marks:{tick:[["OA",1],["OB",1],["OC",1]]}},
+ lines:[
+  [R("二等辺三角形の底角は等しいから"),X("∠OBA＝∠a、∠OCA＝∠b")],
+  [R("三角形の内角の和は180°だから"),X("2∠a＋2∠b＝180°","△ABCの3つの角を、∠aと∠bで表してみよう。")],
+  [F("したがって、"),X("∠a＋∠b＝90°")],
+  [F("すなわち、"),K("∠BAC＝90°")]],
+ groups:[],
+ dummy:{fact:["∠a＋∠b＝180°","∠a＝∠b","∠a＋∠b＝360°"],concl:["∠BAC＝180°"]}},
+
+{id:"tako2",ch:5,page:"p.132",title:"垂直二等分線になること（問5⑵）",
+ text:"右の図で、CA＝CB、DA＝DBとします。⑴で証明した∠ACD＝∠BCDを使って、CDが線分ABの垂直二等分線であることを証明しなさい。",
+ given:"CA＝CB、DA＝DB、∠ACD＝∠BCD", concl:"CDは線分ABの垂直二等分線",
+ fig:{...KITE,marks:{tick:[["CA",1],["CB",1],["DA",2],["DB",2]],arc:[["C","A","E",1],["C","E","B",1]]}},
+ lines:[
+  [F("⑴より"),E("∠ACE＝∠BCE")],
+  [R("仮定より"),X("△CABはCA＝CBの二等辺三角形")],
+  [R("二等辺三角形の頂角の二等分線は、底辺を垂直に2等分するから"),X("CE⊥AB、AE＝BE")],
+  [F("したがって、"),K("CDは線分ABの垂直二等分線である")]],
+ groups:[],
+ dummy:{eq:["∠CAE＝∠CBE"],fact:["△CABは正三角形","CE＝AE"],concl:["ABは線分CDの垂直二等分線である"]}},
+
+{id:"seisan3",ch:5,page:"p.132",title:"正三角形の3つの角（問6）",
+ text:"正三角形の3つの角は等しいことを証明しなさい。（△ABCで、AB＝BC＝CAならば∠A＝∠B＝∠C）",
+ given:"AB＝BC＝CA", concl:"∠A＝∠B＝∠C",
+ fig:{pts:EQT,segs:["AB","BC","CA"],marks:{tick:[["AB",1],["BC",1],["CA",1]]}},
+ lines:[
+  [R("AB＝ACの二等辺三角形と考えられるから"),E("∠B＝∠C","AB＝ACの二等辺三角形の底角はどれかな？"),N],
+  [R("BA＝BCの二等辺三角形とも考えられるから"),E("∠A＝∠C","BA＝BCの二等辺三角形の底角はどれかな？"),N],
+  [F("①、②から"),K("∠A＝∠B＝∠C")]],
+ groups:[],
+ dummy:{eq:["∠A＝∠B"],concl:["AB＝BC＝CA"]},
+ special:{"∠A＝∠B":"∠A＝∠Bになるのは、CA＝CBの二等辺三角形と考えたときだね。"}},
+
+{id:"kihon3",ch:5,page:"p.138",title:"BE＝CD、∠BEC＝∠CDB＝90°のとき",
+ text:"右の図で、BE＝CD、∠BEC＝∠CDB＝90°のとき、AB＝ACとなります。△BCE≡△CBDを示して、このことを証明しなさい。",
+ given:"BE＝CD、∠BEC＝∠CDB＝90°", concl:"AB＝AC",
+ fig:{pts:{A:[150,25],B:[40,215],C:[260,215],E:[95,120],D:[205,120]},segs:["AB","AC","BC","CE","BD"],
+   marks:{right:[["E","B","C"],["D","C","B"]],tick:[["BE",1],["CD",1]],fill:["BCE","CBD"]}},
+ lines:[
+  [T("△BCEと△CBD"),F("において")],
+  [R("仮定より"),E(["∠BEC＝∠CDB＝90°","∠BEC＝∠CDB"]),N],
+  [R("仮定より"),E("BE＝CD"),N],
+  [R("共通な辺だから"),E(["BC＝CB","BC＝BC"]),N],
+  [F("①、②、③より"),C("直角三角形で、斜辺と他の1辺がそれぞれ等しい"),F("から")],
+  [G("△BCE≡△CBD")],
+  [R(KAKU),E("∠EBC＝∠DCB")],
+  [R("2つの角が等しい三角形は二等辺三角形だから"),K("AB＝AC")]],
+ groups:[[1,2,3]],
+ dummy:{eq:["CE＝BD","AE＝AD","AB＝AC"],tri:["△ABDと△ACE"]},
+ special:{"AB＝AC":"AB＝ACは結論です。結論を根拠に使うことはできません。","CE＝BD":"CE＝BDは、合同を示したあとでわかることです。"}},
+
+{id:"taikaku",ch:5,page:"p.141",title:"平行四辺形の対角（問2）",
+ text:"平行四辺形ABCDで、2組の対角がそれぞれ等しいことを証明しなさい。（対角線ACをひいて考えます。）",
+ given:"AB∥DC、AD∥BC", concl:"∠A＝∠C、∠B＝∠D",
+ fig:{pts:PARA2,segs:["AB","BC","CD","DA","AC"],marks:{par:[["AD",1],["BC",1],["BA",2],["CD",2]],arc:[["A","B","C",1],["C","D","A",1],["C","A","B",2],["A","C","D",2]],fill:["ABC","CDA"]}},
+ lines:[
+  [F("対角線ACをひく。")],
+  [T("△ABCと△CDA"),F("において")],
+  [R("共通な辺だから"),E(["AC＝CA","AC＝AC"]),N],
+  [R(["AB∥DCより、平行線の錯角は等しいから",...SAKKAKU]),E("∠BAC＝∠DCA"),N],
+  [R(["AD∥BCより、平行線の錯角は等しいから",...SAKKAKU]),E("∠BCA＝∠DAC"),N],
+  [F("①、②、③より"),C(C1),F("から")],
+  [G("△ABC≡△CDA")],
+  [R(KAKU),E(["∠ABC＝∠CDA","∠B＝∠D"])],
+  [F("また、②、③より"),X("∠BAC＋∠DAC＝∠DCA＋∠BCA","∠BADを2つの角に分けて考えよう。")],
+  [F("すなわち、"),X("∠BAD＝∠DCB")],
+  [F("したがって、"),K("∠A＝∠C、∠B＝∠D")]],
+ groups:[],
+ dummy:{eq:["∠BAC＝∠BCA","AB＝BC"],fact:["∠BAC＋∠DAC＝180°","∠BAD＝∠ABC"],concl:["∠A＝∠B、∠C＝∠D"]}},
+
+{id:"robot",ch:5,page:"p.144",title:"2組の対辺が等しい四角形（ロボット）",
+ text:"四角形ABCDで、AB＝DC、AD＝BCならば、AD∥BCとなります。点BとDを結び、△ABD≡△CDBを示して、このことを証明しなさい。",
+ given:"AB＝DC、AD＝BC", concl:"AD∥BC",
+ fig:{pts:PARA2,segs:["AB","BC","CD","DA","BD"],marks:{tick:[["AB",1],["DC",1],["AD",2],["BC",2]],fill:["ABD","CDB"]}},
+ lines:[
+  [F("点BとDを結ぶ。")],
+  [T("△ABDと△CDB"),F("において")],
+  [R("仮定より"),E(["AB＝CD","AB＝DC"]),N],
+  [R("仮定より"),E(["AD＝CB","AD＝BC"]),N],
+  [R("共通な辺だから"),E(["BD＝DB","BD＝BD"]),N],
+  [F("①、②、③より"),C(C3),F("から")],
+  [G("△ABD≡△CDB")],
+  [R(KAKU),E("∠ADB＝∠CBD"),N],
+  [F("④より"),R("錯角が等しいから"),K("AD∥BC")]],
+ groups:[[2,3,4]],
+ dummy:{eq:["∠ABD＝∠CBD","∠ADB＝∠ABD"],concl:["AB∥DC","AD＝BC"],tri:["△ABCと△CDA"]},
+ special:{"∠ABD＝∠CBD":"AD∥BCを言うには、ADとBCに対する錯角（∠ADBと∠CBD）が等しいことを示そう。"}},
+
+{id:"taikakuJ",ch:5,page:"p.145",title:"2組の対角が等しい四角形（例1）",
+ text:"四角形ABCDで、∠A＝∠C、∠B＝∠Dならば、AD∥BC、AB∥DCとなる（平行四辺形である）ことを証明しなさい。",
+ given:"∠A＝∠C、∠B＝∠D", concl:"AD∥BC、AB∥DC",
+ fig:{pts:{A:[90,60],D:[270,60],B:[40,210],C:[220,210],E:[105,15]},segs:["AB","BC","CD","DA","AE"],
+   marks:{arc:[["A","B","D",1],["C","D","B",1],["B","A","C",2],["D","C","A",2]]}},
+ lines:[
+  [R("四角形の内角の和は360°だから"),X("∠A＋∠B＋∠C＋∠D＝360°")],
+  [F("仮定より∠A＝∠C、∠B＝∠Dだから"),X("∠A＋∠B＋∠A＋∠B＝360°")],
+  [F("したがって、"),X("∠A＋∠B＝180°"),N],
+  [F("頂点Aにおける外角∠DAEをつくると"),X("∠DAE＋∠DAB＝180°"),N],
+  [F("①、②から"),X("∠DAE＝∠B")],
+  [R("同位角が等しいから"),K("AD∥BC")],
+  [F("同様にして"),K(["AB∥DC","AB∥CD"])]],
+ groups:[],
+ dummy:{fact:["∠A＋∠B＝360°","∠DAE＝∠D","∠A＋∠B＝90°"],concl:["AD＝BC","AB＝DC"]}},
+
+{id:"chuutenJ",ch:5,page:"p.145",title:"対角線が中点で交わる四角形（問1）",
+ text:"四角形ABCDの対角線の交点をOとします。対角線がそれぞれの中点で交わる（OA＝OC、OB＝OD）四角形は平行四辺形であることを証明しなさい。",
+ given:"OA＝OC、OB＝OD", concl:"四角形ABCDは平行四辺形",
+ fig:{pts:{...PARA2,O:[150,120]},segs:["AB","BC","CD","DA","AC","BD"],lab:{O:[0,-14]},
+   marks:{tick:[["OA",1],["OC",1],["OB",2],["OD",2]],arc:[["O","A","D",1],["O","C","B",1]],fill:["AOD","COB"]}},
+ lines:[
+  [T("△AODと△COB"),F("において")],
+  [R("仮定より"),E("OA＝OC"),N],
+  [R("仮定より"),E(["OD＝OB","OB＝OD"]),N],
+  [R("対頂角は等しいから"),E("∠AOD＝∠COB"),N],
+  [F("①、②、③より"),C(C2),F("から")],
+  [G("△AOD≡△COB")],
+  [R(KAKU),E("∠OAD＝∠OCB")],
+  [R("錯角が等しいから"),X("AD∥BC")],
+  [F("同様にして"),X(["AB∥DC","AB∥CD"])],
+  [R("2組の対辺がそれぞれ平行だから"),K("四角形ABCDは平行四辺形である")]],
+ groups:[[1,2,3]],
+ dummy:{eq:["AD＝BC","∠OAD＝∠OBC"],fact:["AD＝BC","AB＝DC"],concl:["四角形ABCDはひし形である"],tri:["△AOBと△AOD"]}},
+
+{id:"keisen",ch:5,page:"p.146",title:"ノートの罫線でかいた四角形",
+ text:"ノートの罫線上に3cmの線分AD、別の罫線上に3cmの線分BCをひき、線分AB、DCをひいて四角形ABCDをかきました（AD∥BC、AD＝BC）。四角形ABCDが平行四辺形になることを証明しなさい。",
+ given:"AD∥BC、AD＝BC", concl:"四角形ABCDは平行四辺形",
+ fig:{pts:PARA2,segs:["AB","BC","CD","DA","AC"],marks:{par:[["AD",1],["BC",1]],tick:[["AD",1],["BC",1]],arc:[["C","A","B",1],["A","C","D",1]],fill:["ABC","CDA"]}},
+ lines:[
+  [F("対角線ACをひく。")],
+  [T("△ABCと△CDA"),F("において")],
+  [R("仮定より"),E(["BC＝DA","BC＝AD"]),N],
+  [R(["AD∥BCより、平行線の錯角は等しいから",...SAKKAKU]),E("∠BCA＝∠DAC"),N],
+  [R("共通な辺だから"),E(["AC＝CA","AC＝AC"]),N],
+  [F("①、②、③より"),C(C2),F("から")],
+  [G("△ABC≡△CDA")],
+  [R(KAKU),E("∠BAC＝∠DCA")],
+  [R("錯角が等しいから"),X(["AB∥DC","AB∥CD"])],
+  [F("仮定のAD∥BCとあわせて"),R("2組の対辺がそれぞれ平行だから"),K("四角形ABCDは平行四辺形である")]],
+ groups:[[2,3,4]],
+ dummy:{eq:["AB＝DC","∠ABC＝∠ADC"],fact:["AB＝DC"],concl:["四角形ABCDは長方形である"],tri:["△ABDと△CDB"]}},
+
+{id:"heikou3",ch:5,page:"p.147",title:"平行四辺形になることの証明③（延長上の2点）",
+ text:"平行四辺形ABCDの対角線BDを延長した直線上に、BE＝DFとなるように2点E、Fをとると、四角形AECFは平行四辺形になります。このことを証明しなさい。",
+ given:"四角形ABCDは平行四辺形、BE＝DF", concl:"四角形AECFは平行四辺形",
+ fig:{pts:{A:[110,70],D:[240,70],B:[60,180],C:[190,180],E:[6,213],F:[294,37],O:[150,125]},segs:["AB","BC","CD","DA","EF","AC","AE","EC","CF","FA"],lab:{O:[0,-14]},
+   marks:{tick:[["BE",1],["DF",1]]}},
+ lines:[
+  [F("平行四辺形ABCDの対角線の交点をOとする。")],
+  [R("平行四辺形の対角線はそれぞれの中点で交わるから"),E("OA＝OC"),N],
+  [R("平行四辺形の対角線はそれぞれの中点で交わるから"),E("OB＝OD"),N],
+  [R("仮定より"),E("BE＝DF"),N],
+  [F("②、③から"),X("OB＋BE＝OD＋DF","OEは、OBにBEをたした長さだね。")],
+  [F("すなわち、"),X("OE＝OF"),N],
+  [F("①、④より"),R("対角線がそれぞれの中点で交わるから"),K("四角形AECFは平行四辺形である")]],
+ groups:[],
+ dummy:{eq:["AE＝CF","OA＝OB"],fact:["OB－BE＝OD－DF","OE＝OA"],concl:["四角形AECFはひし形である"]}},
+
+{id:"choukeiH",ch:5,page:"p.149",title:"長方形は平行四辺形（例1）",
+ text:"長方形が平行四辺形であることを、長方形の定義をもとに証明しなさい。",
+ given:"長方形の定義（4つの角がすべて等しい）", concl:"長方形は平行四辺形",
+ fig:{pts:{A:[50,40],D:[250,40],B:[50,200],C:[250,200]},segs:["AB","BC","CD","DA"],marks:{right:[["A","B","D"],["B","A","C"],["C","B","D"],["D","A","C"]]}},
+ lines:[
+  [R("長方形の定義から"),X("4つの角がすべて等しい")],
+  [F("したがって、"),X("2組の対角がそれぞれ等しい")],
+  [R("2組の対角がそれぞれ等しいから"),K("長方形は平行四辺形である")]],
+ groups:[],
+ dummy:{fact:["4つの辺がすべて等しい","2組の対辺がそれぞれ等しい"],concl:["長方形はひし形である"]}},
+
+{id:"hishiH",ch:5,page:"p.149",title:"ひし形は平行四辺形（問1）",
+ text:"ひし形が平行四辺形であることを、ひし形の定義をもとに証明しなさい。",
+ given:"ひし形の定義（4つの辺がすべて等しい）", concl:"ひし形は平行四辺形",
+ fig:{pts:{A:[150,25],B:[40,125],C:[150,225],D:[260,125]},segs:["AB","BC","CD","DA"],marks:{tick:[["AB",1],["BC",1],["CD",1],["DA",1]]}},
+ lines:[
+  [R("ひし形の定義から"),X("4つの辺がすべて等しい")],
+  [F("したがって、"),X("2組の対辺がそれぞれ等しい")],
+  [R("2組の対辺がそれぞれ等しいから"),K("ひし形は平行四辺形である")]],
+ groups:[],
+ dummy:{fact:["4つの角がすべて等しい","2組の対角がそれぞれ等しい"],concl:["ひし形は長方形である"]}},
+
+{id:"seihouH",ch:5,page:"p.149",title:"正方形は平行四辺形（問1）",
+ text:"正方形が平行四辺形であることを、正方形の定義をもとに証明しなさい。",
+ given:"正方形の定義（4つの角がすべて等しく、4つの辺がすべて等しい）", concl:"正方形は平行四辺形",
+ fig:{pts:{A:[60,30],D:[240,30],B:[60,210],C:[240,210]},segs:["AB","BC","CD","DA"],marks:{right:[["A","B","D"],["B","A","C"],["C","B","D"],["D","A","C"]],tick:[["AB",1],["BC",1],["CD",1],["DA",1]]}},
+ lines:[
+  [R("正方形の定義から"),X(["4つの角がすべて等しい","4つの辺がすべて等しい"])],
+  [F("したがって、"),X(["2組の対角がそれぞれ等しい","2組の対辺がそれぞれ等しい"])],
+  [R(["2組の対角がそれぞれ等しいから","2組の対辺がそれぞれ等しいから"]),K("正方形は平行四辺形である")]],
+ groups:[],
+ dummy:{fact:["4つの辺がすべて等しい","2組の対辺がそれぞれ等しい","1組の対辺だけが平行"],concl:["正方形は台形ではない"]}},
+
+{id:"kihon2a",ch:5,page:"p.155",title:"2つの平行四辺形⑴（AD＝EF）",
+ text:"右の図で、2つの四角形ABCD、EBCFはともに平行四辺形です。AD＝EFとなることを証明しなさい。",
+ given:"四角形ABCD、EBCFは平行四辺形", concl:"AD＝EF",
+ fig:{pts:TWO_PARA.pts,segs:["AB","BC","CD","DA","EB","CF","EF"],marks:{tick:[["AD",1],["BC",1],["EF",1]]}},
+ lines:[
+  [R("平行四辺形の対辺は等しいから"),E(["AD＝BC","BC＝AD"]),N],
+  [R("平行四辺形の対辺は等しいから"),E(["EF＝BC","BC＝EF"]),N],
+  [F("①、②より"),K("AD＝EF")]],
+ groups:[[0,1]],
+ dummy:{eq:["AB＝EF","AD＝AB"],concl:["AE＝DF"]}},
+
+{id:"kihon2b",ch:5,page:"p.155",title:"2つの平行四辺形⑵（AEFDは平行四辺形）",
+ text:"右の図で、2つの四角形ABCD、EBCFはともに平行四辺形です。⑴のAD＝EFを使って、四角形AEFDが平行四辺形になることを証明しなさい。",
+ given:"四角形ABCD、EBCFは平行四辺形、AD＝EF", concl:"四角形AEFDは平行四辺形",
+ fig:{pts:TWO_PARA.pts,segs:["AB","BC","CD","DA","EB","CF","EF","AE","DF"],marks:{par:[["AD",1],["BC",1],["EF",1]]}},
+ lines:[
+  [R("平行四辺形の対辺は平行だから"),X("AD∥BC、EF∥BC")],
+  [F("したがって、"),X("AD∥EF")],
+  [F("⑴より"),E("AD＝EF")],
+  [R("1組の対辺が平行でその長さが等しいから"),K("四角形AEFDは平行四辺形である")]],
+ groups:[],
+ dummy:{eq:["AE＝DF"],fact:["AE∥DF","AD∥AE"],concl:["四角形AEFDは長方形である"]}},
+
+{id:"shouA5",ch:5,page:"p.158",title:"対角線を共有する2つの平行四辺形（章の問題A5）",
+ text:"線分BDを対角線とする2つの平行四辺形ABCD、A′BC′Dでは、それぞれの対角線AC、A′C′、BDは同じ点で交わります。このことを証明しなさい。",
+ given:"四角形ABCD、A′BC′Dは平行四辺形", concl:"AC、A′C′、BDは同じ点で交わる",
+ fig:{pts:{B:[40,200],D:[260,60],A:[60,70],C:[240,190],P:[170,20],Q:[130,240]},name:{P:"A′",Q:"C′"},
+   segs:["AB","BC","CD","DA","PB","BQ","QD","DP","AC","PQ","BD"]},
+ lines:[
+  [R("平行四辺形の対角線はそれぞれの中点で交わるから"),X("ACは、BDの中点を通る")],
+  [R("平行四辺形の対角線はそれぞれの中点で交わるから"),X("A′C′は、BDの中点を通る")],
+  [F("したがって、"),K("AC、A′C′、BDは、BDの中点で交わる")]],
+ groups:[[0,1]],
+ dummy:{fact:["ACは、A′C′の中点を通らない","BDは、ACと平行"],concl:["AC、A′C′、BDは平行である"]}},
+
+{id:"shouB2",ch:5,page:"p.159",title:"直角二等辺三角形と垂線（章の問題B2）",
+ text:"右の図で、直線lは直角二等辺三角形ABC（∠BAC＝90°、AB＝AC）の頂点Aを通る直線で、BD、CEは、それぞれB、Cから直線lにひいた垂線です。このとき、BD＋CE＝DEとなることを証明しなさい。",
+ given:"AB＝AC、∠BAC＝90°、BD⊥l、CE⊥l", concl:"BD＋CE＝DE",
+ fig:{pts:{A:[150,150],B:[110,40],D:[110,150],C:[260,110],E:[260,150],L:[15,150],M:[295,150]},hide:["L","M"],lab:{A:[4,18],D:[-4,18],E:[4,18]},
+   segs:["LM","AB","AC","BC","BD","CE"],
+   marks:{right:[["A","B","C"],["D","A","B"],["E","A","C"]],tick:[["AB",1],["AC",1]],fill:["ABD","CAE"]}},
+ lines:[
+  [T("△ABDと△CAE"),F("において")],
+  [R("仮定より"),E(["AB＝CA","AB＝AC"]),N],
+  [R("仮定より"),E(["∠ADB＝∠CEA＝90°","∠ADB＝∠CEA"]),N],
+  [R("三角形の内角の和は180°だから"),X("∠ABD＝90°－∠BAD")],
+  [R("∠BAC＝90°で、∠DAEは一直線の角だから"),X("∠CAE＝90°－∠BAD")],
+  [F("よって、"),E("∠ABD＝∠CAE"),N],
+  [F("①、②、③より"),C(CR1),F("から")],
+  [G("△ABD≡△CAE")],
+  [R(HEN),X("BD＝AE、AD＝CE")],
+  [F("したがって、"),K("BD＋CE＝AE＋AD＝DE")]],
+ groups:[[1,2]],
+ dummy:{eq:["BD＝CE","∠ABD＝∠ACE"],fact:["∠ABD＝∠BAD","BD＝AD、AE＝CE"],concl:["BD＋CE＝BC"],tri:["△ABCと△ADE"]}},
+
+{id:"shouB3",ch:5,page:"p.159",title:"平行四辺形と角の二等分線（章の問題B3）",
+ text:"平行四辺形ABCDで、∠BADの二等分線と辺BCとの交点をEとします。このとき、EC＋CD＝ADとなることを証明しなさい。",
+ given:"四角形ABCDは平行四辺形、∠BAE＝∠DAE", concl:"EC＋CD＝AD",
+ fig:{pts:{A:[80,40],D:[290,40],B:[30,200],C:[240,200],E:[198,200]},segs:["AB","BC","CD","DA","AE"],
+   marks:{par:[["AD",1],["BC",1]],arc:[["A","B","E",1],["A","E","D",1],["E","A","B",1]]}},
+ lines:[
+  [R(["AEは∠BADの二等分線だから","仮定より"]),E("∠BAE＝∠DAE"),N],
+  [R(["AD∥BCより、平行線の錯角は等しいから",...SAKKAKU]),E(["∠DAE＝∠AEB","∠DAE＝∠BEA"]),N],
+  [F("①、②より"),E(["∠BAE＝∠BEA","∠BAE＝∠AEB"])],
+  [R("2つの角が等しいから"),X("△BAEは二等辺三角形で、BA＝BE")],
+  [R("平行四辺形の対辺は等しいから"),X("CD＝AB、AD＝BC")],
+  [F("したがって、"),K("EC＋CD＝EC＋BE＝BC＝AD")]],
+ groups:[],
+ dummy:{eq:["∠BAE＝∠DCE","AE＝AD"],fact:["△AECは二等辺三角形で、AE＝CE","CD＝AD"],concl:["EC＋CD＝AE"]}}
+);
+PROBLEMS.sort((a,b)=>a.ch-b.ch || parseInt(a.page.slice(2))-parseInt(b.page.slice(2)));
+
+
+/* ===== 共通の部品 ===== */
+const CIRC=["①","②","③","④","⑤","⑥","⑦","⑧"];
+const CATS={tri:"三角形の組",reason:"根拠",eq:"等しい辺や角",cond:"合同条件",cong:"合同の式",concl:"結論",fact:"わかること"};
+const CAT_HINT={
+  tri:"結論に出てくる辺や角をふくむ2つの三角形を探そう。",
+  reason:"その式が言える理由は何かな？仮定、共通、対頂角、平行線の性質、図形の性質などから考えよう。",
+  eq:"仮定や図から、2つの三角形で等しい辺や角を見つけよう。",
+  cond:"①②③が「辺」か「角」かを確かめて、合同条件を選ぼう。",
+  cong:"合同の式は、対応する頂点の順に書こう。",
+  concl:"証明したいこと（結論）は何かな？問題文をもう一度読もう。",
+  fact:"前の行までにわかったことから、何が言えるかな？"
+};
+const REASON_POOL=[["仮定より",4],["共通な辺だから",4],["共通な角だから",4],["対頂角は等しいから",4],["平行線の錯角は等しいから",4],["平行線の同位角は等しいから",4],
+  ["合同な図形の対応する辺は等しいから",4],["合同な図形の対応する角は等しいから",4],["三角形の内角の和は180°だから",4],["三角形の外角は、それと隣り合わない2つの内角の和に等しいから",4],["錯角が等しいから",4],["同位角が等しいから",4],
+  ["二等辺三角形の底角は等しいから",5],["平行四辺形の対辺は等しいから",5],["平行四辺形の対角は等しいから",5],["平行四辺形の対角線はそれぞれの中点で交わるから",5],
+  ["2組の対辺がそれぞれ等しいから",5],["2組の対辺がそれぞれ平行だから",5],["2組の対角がそれぞれ等しいから",5],["四角形の内角の和は360°だから",5],["二等辺三角形の頂角の二等分線は、底辺を垂直に2等分するから",5],["2つの角が等しいから",5],["長方形の定義から",5],["ひし形の定義から",5],["対角線がそれぞれの中点で交わるから",5],["1組の対辺が平行でその長さが等しいから",5]];
+const COND_POOL={4:["3組の辺がそれぞれ等しい","2組の辺とその間の角がそれぞれ等しい","1組の辺とその両端の角がそれぞれ等しい"]};
+COND_POOL[5]=COND_POOL[4].concat(["直角三角形で、斜辺と1つの鋭角がそれぞれ等しい","直角三角形で、斜辺と他の1辺がそれぞれ等しい"]);
+
+function seeded(arr,seed){ let s=seed||12345; const a=arr.slice();
+  for(let i=a.length-1;i>0;i--){ s=(s*1103515245+12345)%2147483648; const j=s%(i+1); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const uniq=a=>[...new Set(a)];
+const arr=a=>Array.isArray(a)?a:[a];
+function perms(a){ if(a.length<=1) return [a.slice()]; const out=[]; a.forEach((x,i)=>perms(a.filter((_,j)=>j!==i)).forEach(p=>out.push([x,...p]))); return out; }
+
+/* 三角形の組・合同の式は頂点の書き方がちがっても正解にする */
+function triKey(s){ const m=s.match(/^△(.{3})と△(.{3})$/); if(!m) return null; return [m[1],m[2]].map(t=>[...t].sort().join("")).sort().join("|"); }
+function congKey(s){ const m=s.match(/^△(.{3})≡△(.{3})$/); if(!m) return null;
+  const a=[...m[1]],b=[...m[2]]; return a.map((x,i)=>[x,b[i]].sort().join("")).sort().join("|"); }
+function tokMatch(cat,user,ans){
+  if(user==null) return false;
+  if(ans.includes(user)) return true;
+  if(cat==="tri"){ const k=triKey(user); return k!==null && ans.some(a=>triKey(a)===k); }
+  if(cat==="cong"){ const k=congKey(user); return k!==null && ans.some(a=>congKey(a)===k); }
+  return false;
+}
+function congDummies(s){ const m=s.match(/^△(.{3})≡△(.{3})$/); if(!m) return [];
+  const b=m[2]; return uniq(["△"+m[1]+"≡△"+b[0]+b[2]+b[1], "△"+m[1]+"≡△"+b[1]+b[0]+b[2]]).filter(x=>congKey(x)!==congKey(s)); }
+
+/* ===== 問題を使える形に整える ===== */
+function compile(raw,idx){
+  const P={...raw}; P.rows=[]; P.slots=[];
+  raw.lines.forEach((line,li)=>{
+    const parts=line.map((t,j)=>{
+      if(t.f) return {text:t.f};
+      if(t.n) return {num:true};
+      const p={slot:"s"+li+"_"+j,cat:t.c,ans:arr(t.a),h:t.h,li,j}; P.slots.push(p); return p;
+    });
+    P.rows.push({parts});
+  });
+  P.slot=Object.fromEntries(P.slots.map(p=>[p.slot,p]));
+  // 入れかえの組み合わせ
+  let maps=[raw.lines.map((_,i)=>i)];
+  (raw.groups||[]).forEach(g=>{
+    const nm=[]; maps.forEach(m=>perms(g).forEach(pg=>{ const mm=m.slice(); g.forEach((pos,k)=>mm[pos]=pg[k]); nm.push(mm); })); maps=nm;
+  });
+  P.maps=maps;
+  // ブロック
+  const ansOf=c=>uniq(P.slots.filter(s=>s.cat===c).map(s=>s.ans[0]));
+  const d=raw.dummy||{};
+  const reasonAns=ansOf("reason");
+  const reasonDum=seeded(REASON_POOL.filter(([t,ch])=>ch<=P.ch && !P.slots.some(s=>s.cat==="reason"&&s.ans.includes(t))).map(x=>x[0]),idx*7+3);
+  const congAns=ansOf("cong");
+  P.pal={
+    tri:uniq(ansOf("tri").concat(d.tri||[])),
+    reason:uniq(reasonAns.concat(reasonDum.slice(0,Math.max(3,8-reasonAns.length)))),
+    eq:uniq(ansOf("eq").concat(d.eq||[])),
+    cond:COND_POOL[P.ch],
+    cong:uniq(congAns.concat(congAns.flatMap(congDummies))),
+    concl:uniq(ansOf("concl").concat(d.concl||[])),
+    fact:uniq(ansOf("fact").concat(d.fact||[]))
+  };
+  Object.keys(P.pal).forEach(k=>P.pal[k]=seeded(P.pal[k],idx*13+k.length));
+  P.catOf={}; Object.entries(P.pal).forEach(([c,l])=>l.forEach(t=>{ if(!P.catOf[t]) P.catOf[t]=c; }));
+  P.allBlocks=seeded(uniq(Object.entries(P.pal).filter(([c])=>P.slots.some(s=>s.cat===c)).flatMap(([,l])=>l)),idx*31+5);
+  // 枠なし用
+  const fixes=uniq(raw.lines.flat().filter(t=>t.f).map(t=>t.f));
+  const nNum=raw.lines.flat().filter(t=>t.n).length;
+  const nums=CIRC.slice(0,nNum+1).map(c=>"…"+c);
+  const freeExtra=reasonDum.slice(0,3);
+  P.freeBlocks=seeded(uniq(P.allBlocks.filter(t=>P.catOf[t]!=="reason"||reasonAns.includes(t)).concat(freeExtra,fixes,nums)),idx*17+11);
+  P.streams=maps.map(m=>{ let k=0; const st=[];
+    m.forEach(src=>raw.lines[src].forEach(t=>{
+      if(t.f) st.push({cat:"fix",ans:[t.f]});
+      else if(t.n) st.push({cat:"num",ans:["…"+CIRC[k++]]});
+      else st.push({cat:t.c,ans:arr(t.a)});
+    }));
+    return st; });
+  return P;
+}
+const PS=PROBLEMS.map(compile);
+
+/* ===== 状態 ===== */
+const MODES=["hint","nohint","free"];
+let mode="free", pi=0;
+const STATE={};
+function st(){ const id=PS[pi].id; if(!STATE[id]) STATE[id]={vals:{},focus:PS[pi].slots[0]?.slot||null,lines:[[]],cur:0,marks:null,freeMark:null}; return STATE[id]; }
+let dl=null, lastCanvas=null;
+
+function readHash(){
+  let h=""; try{ h=location.hash.replace(/^#/,""); }catch(e){} if(!h) return;
+  const parts=h.split("-"); let m=null;
+  if(MODES.includes(parts[parts.length-1])) m=parts.pop();
+  const id=parts.join("-"); const k=PS.findIndex(p=>p.id===id);
+  if(k>=0) pi=k; if(m) mode=m;
+}
+function writeHash(){ try{ history.replaceState(null,"","#"+PS[pi].id+"-"+mode); }catch(e){ /* ファイルで開いたときなど、URLを書きかえられない環境では何もしない */ } }
+
+/* ===== 判定 ===== */
+function evaluate(){
+  const P=PS[pi], S=st(); let best=null;
+  P.maps.forEach(m=>{
+    const status={}; let score=0;
+    P.slots.forEach(p=>{
+      const src=PROBLEMS[pi].lines[m[p.li]][p.j];
+      const ans=arr(src.a), v=S.vals[p.slot];
+      const s=!v?"empty":(tokMatch(p.cat,v,ans)?"ok":"ng"); status[p.slot]=s; if(s==="ok") score++;
+    });
+    if(!best||score>best.score) best={status,score,map:m};
+  });
+  const bad=P.slots.filter(p=>best.status[p.slot]!=="ok");
+  return {st:best.status,bad,allOk:bad.length===0,map:best.map};
+}
+function evaluateFree(){
+  const P=PS[pi], S=st(); const flat=[], lineOf=[];
+  S.lines.forEach((l,li)=>l.forEach(t=>{ flat.push(t); lineOf.push(li); }));
+  let best=0, ok=false;
+  P.streams.forEach(a=>{
+    let k=0; while(k<a.length && k<flat.length && tokMatch(a[k].cat,flat[k],a[k].ans)) k++;
+    if(k===a.length && flat.length===a.length) ok=true;
+    if(k>best) best=k;
+  });
+  if(ok) return {allOk:true};
+  if(best>=flat.length) return {allOk:false,short:true};
+  return {allOk:false,line:lineOf[best]};
+}
+function hintOf(p){
+  const P=PS[pi], S=st(), v=S.vals[p.slot];
+  if(v && S.marks && S.marks.st[p.slot]==="ng"){
+    if(P.special && P.special[v]) return P.special[v];
+    if(p.cat==="cong" && congKey(v)!==null) return "合同の式は、対応する頂点の順に書きます。図で、どの頂点どうしが重なるか確かめよう。";
+    if(p.cat==="reason" && S.marks.map){ const src=PROBLEMS[pi].lines[S.marks.map[p.li]][p.j]; if(src.h) return src.h; }
+  }
+  return p.h || CAT_HINT[p.cat];
+}
+
+/* ===== 図 ===== */
+function figInfo(fig){
+  const pts=fig.pts, names=Object.keys(pts);
+  const cx=names.reduce((s,n)=>s+pts[n][0],0)/names.length, cy=names.reduce((s,n)=>s+pts[n][1],0)/names.length;
+  const lab={}; names.forEach(n=>{
+    if((fig.hide||[]).includes(n)) return;
+    if(fig.lab&&fig.lab[n]){ lab[n]=[pts[n][0]+fig.lab[n][0],pts[n][1]+fig.lab[n][1]]; return; }
+    let dx=pts[n][0]-cx, dy=pts[n][1]-cy; const l=Math.hypot(dx,dy)||1; lab[n]=[pts[n][0]+dx/l*15,pts[n][1]+dy/l*15];
+  });
+  return {pts,lab};
+}
+const U=(a,b)=>{ const dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy); return [dx/l,dy/l]; };
+function markShapes(fig,hint){
+  // 線や弧を「描く命令」の配列にして、SVGとcanvasで共有する
+  const out={fills:[],lines:[],arcs:[]}, p=fig.pts, mk=fig.marks||{};
+  if(!hint) return out;
+  const FILL=["rgba(70,120,220,.22)","rgba(240,120,60,.22)"];
+  (mk.fill||[]).forEach((tri,i)=>out.fills.push({pts:[...tri].map(n=>p[n]),color:FILL[i%2]}));
+  (mk.tick||[]).forEach(([s,n])=>{ const a=p[s[0]],b=p[s[1]],m=[(a[0]+b[0])/2,(a[1]+b[1])/2],u=U(a,b),v=[-u[1],u[0]];
+    for(let k=0;k<n;k++){ const o=(k-(n-1)/2)*5; const c=[m[0]+u[0]*o,m[1]+u[1]*o]; out.lines.push([[c[0]-v[0]*7,c[1]-v[1]*7],[c[0]+v[0]*7,c[1]+v[1]*7]]); } });
+  (mk.par||[]).forEach(([s,n])=>{ const a=p[s[0]],b=p[s[1]],m=[(a[0]+b[0])/2,(a[1]+b[1])/2],u=U(a,b),v=[-u[1],u[0]];
+    for(let k=0;k<n;k++){ const o=(k-(n-1)/2)*6; const c=[m[0]+u[0]*o,m[1]+u[1]*o];
+      out.lines.push([[c[0]-u[0]*6+v[0]*5,c[1]-u[1]*6+v[1]*5],c]); out.lines.push([[c[0]-u[0]*6-v[0]*5,c[1]-u[1]*6-v[1]*5],c]); } });
+  (mk.arc||[]).forEach(([V,A,B,n])=>{ const c=p[V]; let a1=Math.atan2(p[A][1]-c[1],p[A][0]-c[0]), a2=Math.atan2(p[B][1]-c[1],p[B][0]-c[0]);
+    let d=a2-a1; while(d>Math.PI)d-=2*Math.PI; while(d<=-Math.PI)d+=2*Math.PI;
+    for(let k=0;k<n;k++) out.arcs.push({c,r:20+k*5,a1,d}); });
+  (mk.right||[]).forEach(([V,A,B])=>{ const c=p[V],u=U(c,p[A]),w=U(c,p[B]),s=10;
+    const q1=[c[0]+u[0]*s,c[1]+u[1]*s],q2=[c[0]+u[0]*s+w[0]*s,c[1]+u[1]*s+w[1]*s],q3=[c[0]+w[0]*s,c[1]+w[1]*s];
+    out.lines.push([q1,q2]); out.lines.push([q2,q3]); });
+  return out;
+}
+function figSVG(fig,hint){
+  const {pts,lab}=figInfo(fig), sh=markShapes(fig,hint); let s="";
+  sh.fills.forEach(f=>s+=`<polygon points="${f.pts.map(q=>q.join(",")).join(" ")}" fill="${f.color}"/>`);
+  s+=`<g stroke="#222" stroke-width="2.2" fill="none" stroke-linecap="round">`;
+  fig.segs.forEach(sg=>{ const a=pts[sg[0]],b=pts[sg[1]]; s+=`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}"/>`; });
+  s+=`</g><g stroke="#c0392b" stroke-width="1.8" fill="none">`;
+  sh.lines.forEach(([a,b])=>s+=`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}"/>`);
+  sh.arcs.forEach(({c,r,a1,d})=>{ const x1=c[0]+r*Math.cos(a1),y1=c[1]+r*Math.sin(a1),x2=c[0]+r*Math.cos(a1+d),y2=c[1]+r*Math.sin(a1+d);
+    s+=`<path d="M${x1} ${y1} A${r} ${r} 0 0 ${d>0?1:0} ${x2} ${y2}"/>`; });
+  s+=`</g><g font-size="18" font-family="sans-serif" fill="#222" text-anchor="middle">`;
+  Object.entries(lab).forEach(([n,q])=>s+=`<text x="${q[0]}" y="${q[1]+6}">${(fig.name&&fig.name[n])||n}</text>`);
+  return s+"</g>";
+}
+function drawFigCanvas(ctx,fig,ox,oy,sc,hint){
+  const {pts,lab}=figInfo(fig), sh=markShapes(fig,hint);
+  ctx.save(); ctx.translate(ox+15*sc,oy+15*sc); ctx.scale(sc,sc);
+  sh.fills.forEach(f=>{ ctx.beginPath(); f.pts.forEach((q,i)=>i?ctx.lineTo(...q):ctx.moveTo(...q)); ctx.closePath(); ctx.fillStyle=f.color; ctx.fill(); });
+  ctx.strokeStyle="#222"; ctx.lineWidth=2.2; ctx.lineCap="round";
+  fig.segs.forEach(sg=>{ ctx.beginPath(); ctx.moveTo(...pts[sg[0]]); ctx.lineTo(...pts[sg[1]]); ctx.stroke(); });
+  ctx.strokeStyle="#c0392b"; ctx.lineWidth=1.8;
+  sh.lines.forEach(([a,b])=>{ ctx.beginPath(); ctx.moveTo(...a); ctx.lineTo(...b); ctx.stroke(); });
+  sh.arcs.forEach(({c,r,a1,d})=>{ ctx.beginPath(); ctx.arc(c[0],c[1],r,a1,a1+d,d<0); ctx.stroke(); });
+  ctx.fillStyle="#222"; ctx.font="18px sans-serif"; ctx.textAlign="center";
+  Object.entries(lab).forEach(([n,q])=>ctx.fillText((fig.name&&fig.name[n])||n,q[0],q[1]+6));
+  ctx.restore();
+}
+
+/* ===== 画面 ===== */
+const $=id=>document.getElementById(id);
+function showMsg(t,k){ const m=$("msg"); m.textContent=t; m.className="msg show "+k; }
+function hideMsg(){ $("msg").className="msg"; }
+function changed(){ const S=st(); S.marks=null; S.freeMark=null; hideMsg(); }
+function nextEmpty(from){ const P=PS[pi],S=st(); const i0=P.slots.findIndex(p=>p.slot===from);
+  for(let k=1;k<=P.slots.length;k++){ const p=P.slots[(i0+k)%P.slots.length]; if(!S.vals[p.slot]) return p.slot; } return null; }
+
+function buildSelect(){
+  const sel=$("psel"); sel.innerHTML="";
+  [[4,"4章 平行と合同"],[5,"5章 三角形と四角形"]].forEach(([ch,label])=>{
+    const g=document.createElement("optgroup"); g.label=label;
+    PS.forEach((p,i)=>{ if(p.ch!==ch) return; const o=document.createElement("option"); o.value=i; o.textContent=p.page+"　"+p.title; g.appendChild(o); });
+    sel.appendChild(g);
+  });
+  sel.onchange=()=>{ pi=+sel.value; afterSwitch(); };
+}
+function afterSwitch(){ writeHash(); hideMsg(); $("imgPanel").classList.remove("show"); render(); window.scrollTo({top:0}); }
+$("prevBtn").onclick=()=>{ pi=(pi-1+PS.length)%PS.length; afterSwitch(); };
+$("nextBtn").onclick=()=>{ pi=(pi+1)%PS.length; afterSwitch(); };
+
+function render(){
+  const P=PS[pi], S=st(), hint=mode==="hint";
+  document.body.dataset.mode=mode;
+  $("mHint").classList.toggle("on",hint); $("mNo").classList.toggle("on",mode==="nohint"); $("mFree").classList.toggle("on",mode==="free");
+  $("psel").value=pi;
+  $("ptag").textContent=(P.ch===4?"4章 平行と合同":"5章 三角形と四角形")+"　教科書"+P.page;
+  $("probText").textContent=P.text;
+  $("given").innerHTML="";
+  [["仮定",P.given],["結論",P.concl]].forEach(([k,v])=>{ const d=document.createElement("div"); const b=document.createElement("b"); b.textContent=k; d.appendChild(b); d.appendChild(document.createTextNode(v)); $("given").appendChild(d); });
+  $("fig").innerHTML=figSVG(P.fig,hint);
+  if(mode==="free"){ renderFree(); return; }
+
+  const proof=$("proof"); proof.innerHTML=""; let k=0;
+  P.rows.forEach(row=>{
+    const div=document.createElement("div"); div.className="row";
+    row.parts.forEach(p=>{
+      if(p.text!=null){ const s=document.createElement("span"); s.className="fix"; s.textContent=p.text; div.appendChild(s); }
+      else if(p.num){ const s=document.createElement("span"); s.className="num"; s.textContent="…"+CIRC[k++]; div.appendChild(s); }
+      else{
+        const b=document.createElement("button"), v=S.vals[p.slot];
+        b.className="slot"+(v?" filled":"")+(S.focus===p.slot?" focus":"");
+        if(hint&&v) b.classList.add("c-"+p.cat);
+        if(S.marks&&hint){ const s=S.marks.st[p.slot]; if(s==="ok")b.classList.add("ok"); if(s==="ng")b.classList.add("ng"); }
+        b.textContent=v||(hint?CATS[p.cat]:"　　　　");
+        b.onclick=()=>{ if(S.focus===p.slot&&S.vals[p.slot]){ delete S.vals[p.slot]; changed(); } else S.focus=p.slot; render(); };
+        div.appendChild(b);
+      }
+    });
+    proof.appendChild(div);
+  });
+  let list;
+  if(hint){
+    if(S.focus){ const c=P.slot[S.focus].cat; list=P.pal[c]; $("palhead").textContent="「"+CATS[c]+"」のブロック（タップで入る／入れたブロックをもう一度タップで消える）"; }
+    else { list=[]; $("palhead").textContent="証明の空欄をタップしてください"; }
+  }else{ list=P.allBlocks; $("palhead").textContent="ブロック（空欄をえらんでからタップ／入れたブロックをもう一度タップで消える）"; }
+  const blocks=$("blocks"); blocks.innerHTML="";
+  list.forEach(t=>{
+    const b=document.createElement("button"); b.className="blk c-"+P.catOf[t]; b.textContent=t;
+    b.onclick=()=>{ if(!S.focus) S.focus=nextEmpty(P.slots[P.slots.length-1].slot); if(!S.focus) return;
+      S.vals[S.focus]=t; changed(); S.focus=nextEmpty(S.focus); render(); };
+    blocks.appendChild(b);
+  });
+}
+function renderFree(){
+  const P=PS[pi], S=st(), proof=$("proof"); proof.innerHTML="";
+  S.lines.forEach((l,li)=>{
+    const div=document.createElement("div"); div.className="row fr"+(li===S.cur?" cur":"");
+    const n=document.createElement("span"); n.className="lno"; n.textContent=li+1; div.appendChild(n);
+    if(!l.length){ const s=document.createElement("span"); s.className="ph"; s.textContent=li===S.cur?"ここにブロックが入ります":"（空の行）"; div.appendChild(s); }
+    l.forEach((t,ti)=>{ const b=document.createElement("button"); b.className="tok"; b.textContent=t;
+      b.onclick=e=>{ e.stopPropagation(); l.splice(ti,1); S.cur=li; changed(); render(); }; div.appendChild(b); });
+    div.onclick=()=>{ S.cur=li; render(); };
+    proof.appendChild(div);
+  });
+  $("palhead").textContent="ブロックをタップすると、青い行の最後に入ります（入れたブロックをタップで消える／行をタップでその行をえらぶ）";
+  const blocks=$("blocks"); blocks.innerHTML="";
+  P.freeBlocks.forEach(t=>{ const b=document.createElement("button"); b.className="blk"; b.textContent=t;
+    b.onclick=()=>{ S.lines[S.cur].push(t); changed(); render(); }; blocks.appendChild(b); });
+}
+$("nlBtn").onclick=()=>{ const S=st(); S.lines.splice(S.cur+1,0,[]); S.cur++; changed(); render(); };
+$("bsBtn").onclick=()=>{ const S=st(); if(S.lines[S.cur].length) S.lines[S.cur].pop(); else if(S.lines.length>1){ S.lines.splice(S.cur,1); S.cur=Math.max(0,S.cur-1); } changed(); render(); };
+
+function setMode(m){ mode=m; writeHash(); changed(); $("imgPanel").classList.remove("show"); render(); }
+$("mHint").onclick=()=>setMode("hint"); $("mNo").onclick=()=>setMode("nohint"); $("mFree").onclick=()=>setMode("free");
+window.addEventListener("hashchange",()=>{ readHash(); render(); });
+
+const GOOD="証明完成！　よくできました。下の「画像にする」でロイロノートに貼れます。";
+$("checkBtn").onclick=()=>{
+  const S=st();
+  if(mode==="free"){
+    S.freeMark=evaluateFree();
+    if(S.freeMark.allOk) showMsg(GOOD,"good");
+    else if(!S.lines.some(l=>l.length)) showMsg("ブロックを並べて証明を作ろう。","info");
+    else if(S.freeMark.short) showMsg("ここまでは正しく並んでいます。続きを考えよう。","bad");
+    else { showMsg((S.freeMark.line+1)+"行目にちがうところがあります。","bad"); S.cur=S.freeMark.line; render(); }
+    return;
+  }
+  S.marks=evaluate();
+  if(S.marks.allOk){ showMsg(GOOD,"good"); S.focus=null; render(); return; }
+  if(mode==="hint"){
+    const p=S.marks.bad[0], s=S.marks.st[p.slot];
+    showMsg((s==="empty"?"まだ空いている欄があります。":"赤い欄を見直そう。")+"　ヒント："+hintOf(p),"bad");
+    S.focus=p.slot;
+  }else showMsg("正しくない欄、または空いている欄が あと "+S.marks.bad.length+" か所あります。","bad");
+  render();
+};
+$("hintBtn").onclick=()=>{ const P=PS[pi],S=st(); const id=S.focus||nextEmpty(P.slots[P.slots.length-1].slot)||P.slots[0].slot; S.focus=id; render(); showMsg("ヒント："+hintOf(P.slot[id]),"info"); };
+let clearArm=null;
+$("clearBtn").onclick=()=>{
+  const b=$("clearBtn");
+  if(!clearArm){ b.textContent="本当に消す？"; clearArm=setTimeout(()=>{ b.textContent="全部消す"; clearArm=null; },3000); return; }
+  clearTimeout(clearArm); clearArm=null; b.textContent="全部消す";
+  const S=st(); if(mode==="free"){ S.lines=[[]]; S.cur=0; } else { S.vals={}; S.focus=PS[pi].slots[0]?.slot||null; }
+  changed(); $("imgPanel").classList.remove("show"); render();
+};
+
+/* ===== 画像づくり ===== */
+const FONT='"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",sans-serif';
+function joinTokens(a){ let s=""; a.forEach((t,i)=>{ if(i>0&&t.startsWith("…")) s+="　"; s+=t; if(i<a.length-1&&/(より|から)$/.test(t)) s+="、"; }); return s; }
+function wrapText(ctx,text,maxW,byComma){ const out=[]; let line="";
+  for(const ch of text){ if(ctx.measureText(line+ch).width>maxW&&line&&!"。、）」".includes(ch)){ const k=line.lastIndexOf("、");
+      if(byComma&&k>line.length*0.4&&k<line.length-1){ out.push(line.slice(0,k+1)); line=line.slice(k+1)+ch; } else { out.push(line); line=ch; } } else line+=ch; }
+  if(line) out.push(line); return out; }
+function proofLines(){
+  const P=PS[pi],S=st();
+  if(mode==="free") return S.lines.filter(l=>l.length).map(joinTokens);
+  let k=0; return P.rows.map(r=>joinTokens(r.parts.map(p=>p.text!=null?p.text:p.num?"…"+CIRC[k++]:(S.vals[p.slot]||"（　　　）"))));
+}
+function makeCanvas(){
+  const P=PS[pi], hint=mode==="hint", W=1200, pad=50, name=$("nm").value.trim();
+  const res=mode==="free"?evaluateFree():evaluate();
+  const m=document.createElement("canvas").getContext("2d");
+  m.font="28px "+FONT; const pLines=wrapText(m,P.text,640);
+  const gLines=hint?["仮定　"+P.given,"結論　"+P.concl]:[];
+  m.font="32px "+FONT; const lines=proofLines().flatMap(l=>wrapText(m,l,W-pad*2-30,true));
+  const topH=90, probH=Math.max(pLines.length*46+gLines.length*42+30,340);
+  const H=topH+probH+70+lines.length*58+110;
+  const cv=document.createElement("canvas"); cv.width=W; cv.height=H; const c=cv.getContext("2d");
+  c.fillStyle="#fff"; c.fillRect(0,0,W,H); c.fillStyle="#1f2328";
+  c.font="bold 36px "+FONT; c.fillText("証明　"+P.title,pad,68);
+  c.font="28px "+FONT; c.textAlign="right"; c.fillText("名前　"+(name||"　　　　　　"),W-pad,68); c.textAlign="left";
+  c.strokeStyle="#c9d0d8"; c.lineWidth=2; c.beginPath(); c.moveTo(pad,topH); c.lineTo(W-pad,topH); c.stroke();
+  let y=topH+50; c.font="28px "+FONT; pLines.forEach(l=>{ c.fillText(l,pad,y); y+=46; });
+  y+=6; c.fillStyle="#2f6fd6"; gLines.forEach(l=>{ c.fillText(l,pad,y); y+=42; }); c.fillStyle="#1f2328";
+  drawFigCanvas(c,P.fig,W-pad-396,topH+8,1.2,hint);
+  y=topH+probH+40; c.font="bold 32px "+FONT; c.fillText("【証明】",pad,y); y+=58;
+  c.font="32px "+FONT; lines.forEach(l=>{ c.fillText(l,pad+20,y); y+=58; });
+  c.font="24px "+FONT; c.fillStyle="#5b6470";
+  c.fillText({hint:"ヒントあり",nohint:"ヒントなし",free:"ヒントなし（枠なし）"}[mode]+"　教科書"+P.page,pad,H-40);
+  if(res.allOk){ c.font="bold 30px "+FONT; c.fillStyle="#1f9d55"; c.textAlign="right"; c.fillText("✓ 証明完成",W-pad,H-40); c.textAlign="left"; }
+  return cv;
+}
+$("imgBtn").onclick=()=>{ lastCanvas=makeCanvas(); $("outImg").src=lastCanvas.toDataURL("image/png"); $("imgPanel").classList.add("show"); $("imgPanel").scrollIntoView({behavior:"smooth",block:"start"}); };
+$("copyBtn").onclick=async()=>{ if(!lastCanvas) return;
+  try{ await navigator.clipboard.write([new ClipboardItem({"image/png":new Promise(r=>lastCanvas.toBlob(r,"image/png"))})]); $("copyBtn").textContent="コピーしました"; }
+  catch(e){ $("copyBtn").textContent="コピーできませんでした"; }
+  setTimeout(()=>$("copyBtn").textContent="画像をコピー",2500); };
+const inClaude=!!(window.claude&&typeof window.claude.use==="function");
+if(!inClaude){ $("saveBtn").style.display=""; $("saveBtn").textContent="画像を保存";
+  $("imgNote").textContent="「画像を保存」を押すと、画像がダウンロードフォルダに保存されます。ロイロノートに読み込んで提出しましょう。「画像をコピー」して、ロイロのカードでCtrl＋Vで貼り付けることもできます。"; }
+$("saveBtn").onclick=async()=>{ if(!lastCanvas) return;
+  const name=$("nm").value.trim(), fname="証明_"+PS[pi].title+(name?"_"+name:"")+".png";
+  const blob=await new Promise(r=>lastCanvas.toBlob(r,"image/png"));
+  if(!dl){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=fname; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),5000); return; }
+  try{ await dl.save({filename:fname,data:blob}); }
+  catch(e){ if(e&&e.code!=="declined"&&e.code!=="rate_limited") $("saveBtn").style.display="none"; } };
+(async()=>{ try{ if(window.claude&&typeof window.claude.use==="function") dl=await window.claude.use("downloads"); }catch(e){ dl=null; }
+  if(dl){ $("saveBtn").style.display=""; $("imgNote").textContent="iPadでは「画像を保存・送る」から共有メニューが開くので、ロイロノートを選べます。「画像をコピー」してロイロのカードに貼り付けることもできます。うまくいかないときは、画像を長押しして「\"写真\"に保存」してください。"; } })();
+
+buildSelect(); readHash(); render();
+</script>
+</body>
+</html>
